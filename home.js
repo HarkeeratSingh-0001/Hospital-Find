@@ -246,10 +246,7 @@ function normalizeHospitalRecord(row) {
 
 // Load hospitals from API or CSV fallback
 async function loadHospitalDataset() {
-    const apiBase = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
-        ? window.location.origin
-        : 'http://127.0.0.1:8000';
-
+    const API_URL = 'https://hospital-find.onrender.com/api/hospitals';
     // 1. Try server API
     try {
         const res = await fetch(`${apiBase}/api/hospitals`, {

@@ -416,10 +416,7 @@
     <script>
         (function () {
             // Connect frontend to the local server
-            const API_BASE = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
-                ? window.location.origin
-                : 'http://127.0.0.1:8000';
-
+            const API_URL = 'https://hospital-find.onrender.com/api/hospitals';
             const hospitalListEl = document.getElementById('hospitals-container');
             const noResultsEl = document.getElementById('no-results-msg');
             const resultsHeadingEl = document.getElementById('results-count-heading');
