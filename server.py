@@ -115,6 +115,7 @@ def detect_disease_server(text):
             rem = re.sub(pattern, " ", clean).strip()
             return spec, rem
     return None, clean
+
 def get_hospitals_filepath():
     """Use only the hospital database in the server directory to avoid unrelated template data."""
     server_dir = os.path.dirname(__file__)
@@ -138,7 +139,7 @@ def init_csv():
         with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(CSV_HEADERS)
-        print(f"[DATABASE] Initialized new database at: {CSV_FILE}")
+        print(f"[DATABASE] Initialized new database at: {CSV_FILE}", flush=True)
 
 def get_next_id():
     """Determine the next auto-incrementing user ID."""
@@ -159,7 +160,7 @@ def save_user_to_csv(name, email, phone, city):
         writer = csv.writer(f)
         writer.writerow([user_id, timestamp, name, email, phone, city])
     
-    print(f"[DATABASE] Saved User #{user_id}: {name} ({email}, {city}) into users.csv")
+    print(f"[DATABASE] Saved User #{user_id}: {name} ({email}, {phone}, {city}) into users.csv", flush=True)
     return user_id
 
 
@@ -171,7 +172,7 @@ def init_hospitals_csv():
         with open(HOSPITALS_FILE, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(["hospital_name", "district", "city", "speciality", "hospital_rating", "success_rate", "service_readiness_pct", "ranking_score", "speciality_rank", "overall_rank", "no_of_patients_treated"])
-        print(f"[DATABASE] Initialized new hospitals database at: {HOSPITALS_FILE}")
+        print(f"[DATABASE] Initialized new hospitals database at: {HOSPITALS_FILE}", flush=True)
 
 
 def load_hospitals():
@@ -215,17 +216,53 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
         content_length = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else ""
 
-        if self.path == "/register" or self.path.startswith("/register?"):
-            parsed_data = urllib.parse.parse_qs(post_data)
-            name = parsed_data.get("name", [""])[0].strip()
-            email = parsed_data.get("email", [""])[0].strip()
-            phone = parsed_data.get("phone", [""])[0].strip()
-            city = parsed_data.get("city", [""])[0].strip()
+        if self.path in ("/register", "/api/register") or self.path.startswith("/register?") or self.path.startswith("/api/register?"):
+            name, email, phone, city = "", "", "", ""
+            content_type = self.headers.get("Content-Type", "")
 
-            # 1. Save record into users.csv
-            save_user_to_csv(name, email, phone, city)
+            # Support both JSON payload and Form Data
+            if "application/json" in content_type:
+                try:
+                    json_data = json.loads(post_data) if post_data else {}
+                    name = str(json_data.get("name", "")).strip()
+                    email = str(json_data.get("email", "")).strip()
+                    phone = str(json_data.get("phone", "")).strip()
+                    city = str(json_data.get("city", "")).strip()
+                except Exception as err:
+                    print(f"⚠️ JSON Parsing Error: {err}", flush=True)
+            else:
+                parsed_data = urllib.parse.parse_qs(post_data)
+                name = parsed_data.get("name", [""])[0].strip()
+                email = parsed_data.get("email", [""])[0].strip()
+                phone = parsed_data.get("phone", [""])[0].strip()
+                city = parsed_data.get("city", [""])[0].strip()
 
-            # 2. Redirect to Home Page with user's name & city
+            # Live Log in Render Console
+            print("\n" + "="*50, flush=True)
+            print("🔥 NEW USER REGISTRATION RECEIVED!", flush=True)
+            print(f"👤 Name  : {name}", flush=True)
+            print(f"📧 Email : {email}", flush=True)
+            print(f"📞 Phone : {phone}", flush=True)
+            print(f"📍 City  : {city}", flush=True)
+            print("="*50 + "\n", flush=True)
+
+            # Save record into users.csv
+            user_id = save_user_to_csv(name, email, phone, city)
+
+            # Return JSON response for API or JSON requests
+            if "application/json" in content_type or self.path.startswith("/api/"):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                response = {
+                    "success": True,
+                    "message": "User registered successfully!",
+                    "user": {"id": user_id, "name": name, "email": email, "phone": phone, "city": city}
+                }
+                self.wfile.write(json.dumps(response).encode("utf-8"))
+                return
+
+            # Redirect to Home Page for standard HTML form submissions
             encoded_name = urllib.parse.quote(name)
             encoded_city = urllib.parse.quote(city)
             redirect_url = f"/home.html?name={encoded_name}&city={encoded_city}&registered=1"
@@ -426,9 +463,9 @@ if __name__ == "__main__":
     
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", port), HospitalConnectHandler) as httpd:
-        print("=" * 60)
-        print("🏥 HospitalConnect Server with CSV Database is RUNNING!")
-        print(f"👉 Local Web Address: http://localhost:{port}")
-        print(f"👉 Database File: {CSV_FILE}")
-        print("=" * 60)
+        print("=" * 60, flush=True)
+        print("🏥 HospitalConnect Server with CSV Database is RUNNING!", flush=True)
+        print(f"👉 Local Web Address: http://localhost:{port}", flush=True)
+        print(f"👉 Database File: {CSV_FILE}", flush=True)
+        print("=" * 60, flush=True)
         httpd.serve_forever()
