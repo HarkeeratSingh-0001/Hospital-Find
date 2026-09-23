@@ -3,26 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>HospitalConnect - Registration</title>
-    
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="register-container">
-
     <div class="register-left">
         <div class="logo">🏥 NearMed</div>
-
         <h1>Find the Right Hospital.</h1>
-
-        <p>
-            Search hospitals by speciality, location, treatment price
-            and available facilities.
-        </p>
-
+        <p>Search hospitals by speciality, location, treatment price and available facilities.</p>
         <div class="features">
             <div>✓ Search hospitals</div>
             <div>✓ Compare facilities</div>
@@ -31,14 +21,9 @@
         </div>
     </div>
 
-
     <div class="register-card">
-
         <h2>Create Account</h2>
-
-        <p class="subtitle">
-            Register to use HospitalConnect
-        </p>
+        <p class="subtitle">Register to use HospitalConnect</p>
         
         <form id="registration-form">
             <label>Full Name</label>
@@ -65,13 +50,9 @@
                 <option value="Other">Other</option>
             </select>
 
-            <button type="submit" id="submit-btn">
-                Register &amp; Save
-            </button>
+            <button type="submit" id="submit-btn">Register &amp; Save</button>
         </form>
-
     </div>
-
 </div>
 
 <script>
@@ -109,8 +90,9 @@
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            // Fallback redirect if backend is slow
-            window.location.href = 'home.html';
+            alert('Server error! Checking network...');
+            btn.innerText = 'Register & Save';
+            btn.disabled = false;
         }
     });
 </script>
