@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>HospitalConnect - Registration</title>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="register-container">
+
+    <div class="register-left">
+        <div class="logo">🏥 HospitalConnect</div>
+
+        <h1>Find the Right Hospital.</h1>
+
+        <p>
+            Search hospitals by speciality, location, treatment price
+            and available facilities.
+        </p>
+
+        <div class="features">
+            <div>✓ Search hospitals</div>
+            <div>✓ Compare facilities</div>
+            <div>✓ Find hospitals by speciality</div>
+            <div>✓ AI Hospital Assistant</div>
+        </div>
+    </div>
+
+
+    <div class="register-card">
+
+        <h2>Create Account</h2>
+
+        <p class="subtitle">
+            Register to use HospitalConnect
+        </p>
+        <form id="registration-form" action="home.html" method="GET">
+            <label>Full Name</label>
+            <input type="text" name="name" placeholder="Enter your full name" required>
+
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Enter your email" required>
+
+            <label>Phone Number</label>
+            <input type="tel" name="phone" placeholder="Enter phone number" required>
+
+            <label>City</label>
+            <select name="city" required>
+                <option value="">Select your city</option>
+                <option value="Amritsar">Amritsar</option>
+                <option value="Bathinda">Bathinda</option>
+                <option value="Chandigarh">Chandigarh</option>
+                <option value="Jalandhar">Jalandhar</option>
+                <option value="Ludhiana">Ludhiana</option>
+                <option value="Mohali">Mohali</option>
+                <option value="Patiala">Patiala</option>
+                <option value="Pathankot">Pathankot</option>
+                <option value="Hoshiarpur">Hoshiarpur</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <button type="submit">
+                Register &amp; Save
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

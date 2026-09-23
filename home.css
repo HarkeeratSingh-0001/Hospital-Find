@@ -1,0 +1,1832 @@
+/* =========================================================
+   HospitalConnect / VitalCare - Minimalist Nordic Luxury Theme
+   Design System:
+   - Primary Accent: Calm Deep Navy #0f172a / Slate #1e293b
+   - Surface / Canvas: Pure Crisp White #ffffff / Off-White #f8fafc
+   - Hairline Borders: 1px solid #e2e8f0 / Hover #cbd5e1
+   - Accents: Sage Emerald #059669 (Success), Crimson #991b1b (Emergency)
+   - Shadows: Diffused multi-layer ambient illumination
+   - Interaction: Refined spring-eased hover zooming on all tabs
+   ========================================================= */
+
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #6191dd;
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ------------------------------------
+   Nordic Keyframes & Micro-Animations
+------------------------------------ */
+@keyframes emergencyPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
+    }
+}
+
+@keyframes floatBreathing {
+    0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.18);
+    }
+    50% {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.28);
+    }
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.99);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalZoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes chatWindowPop {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes bubbleSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes countPop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ------------------------------------
+   Emergency Alert Bar (Refined Crimson)
+------------------------------------ */
+.emergency-bar {
+    background: #991b1b;
+    color: #ffffff;
+    padding: 8px 20px;
+    font-size: 12.5px;
+    position: relative;
+    z-index: 101;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.emergency-content {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.emergency-content span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.1px;
+}
+
+.emergency-call-btn {
+    background: #ffffff;
+    color: #991b1b;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    animation: emergencyPulse 2.6s infinite;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 0.2s ease,
+                box-shadow 0.2s ease;
+    transform-origin: center;
+}
+
+.emergency-call-btn:hover {
+    background: #fef2f2;
+    color: #7f1d1d;
+    transform: scale(1.06) translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.emergency-call-btn:active {
+    transform: scale(0.96);
+}
+
+/* ------------------------------------
+   Minimalist Nordic Navbar
+------------------------------------ */
+.navbar {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: all 0.25s ease;
+}
+
+.nav-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+    transform-origin: left center;
+}
+
+.logo:hover {
+    transform: scale(1.04);
+    color: #1e293b;
+}
+
+.logo-icon {
+    font-size: 22px;
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logo:hover .logo-icon {
+    transform: rotate(-8deg) scale(1.12);
+}
+
+/* ------------------------------------
+   Navigation Tabs (Hover Zooming)
+------------------------------------ */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-links a,
+.nav-links .nav-btn {
+    text-decoration: none;
+    color: #475569;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.24s ease;
+}
+
+/* HOVER ZOOM EFFECT on Navigation Tabs */
+.nav-links a:hover,
+.nav-links .nav-btn:hover {
+    transform: scale(1.06) translateY(-1px);
+    color: #0f172a;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+/* ACTIVE STATE: Calm Deep Navy */
+.nav-links a.active,
+.nav-links .nav-btn.active {
+    background: #0f172a;
+    color: #ffffff !important;
+    border-color: #0f172a;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.18);
+    font-weight: 600;
+}
+
+.nav-links a.active:hover,
+.nav-links .nav-btn.active:hover {
+    transform: scale(1.06) translateY(-1px);
+    background: #1e293b;
+    border-color: #1e293b;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+}
+
+.nav-links a:active,
+.nav-links .nav-btn:active {
+    transform: scale(0.96);
+}
+
+.badge-ai {
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 12px;
+    margin-left: 4px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.nav-links a.active .badge-ai {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-links a:hover .badge-ai {
+    transform: scale(1.08);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Compare Counter Tab Button with Hover Zoom */
+.compare-nav-btn {
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transform-origin: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.24s ease;
+}
+
+.compare-nav-btn:hover {
+    transform: scale(1.06) translateY(-1px);
+    background: #f8fafc;
+    border-color: #0f172a;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.compare-nav-btn:active {
+    transform: scale(0.96);
+}
+
+.compare-nav-btn.bump #compare-count {
+    display: inline-block;
+    animation: countPop 0.35s ease-out;
+}
+
+/* User Profile Badge */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 4px 12px;
+    border-radius: 30px;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.user-profile:hover {
+    transform: scale(1.03);
+    border-color: #cbd5e1;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.avatar {
+    width: 30px;
+    height: 30px;
+    background: #0f172a;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: -0.2px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.user-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.user-location {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.logout-btn {
+    font-size: 11.5px;
+    color: #94a3b8;
+    text-decoration: none;
+    margin-left: 6px;
+    padding-left: 8px;
+    border-left: 1px solid #e2e8f0;
+    transition: color 0.2s ease;
+}
+
+.logout-btn:hover {
+    color: #991b1b;
+}
+
+/* ------------------------------------
+   Main Layout Container
+------------------------------------ */
+.main-wrapper {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 28px 20px 70px;
+}
+
+/* ------------------------------------
+   Hero & Advanced Search Section (Architectural Nordic)
+------------------------------------ */
+.hero-section {
+    background: #0f172a;
+    background-image: radial-gradient(at 100% 0%, rgba(30, 58, 138, 0.22) 0px, transparent 55%),
+                      radial-gradient(at 0% 100%, rgba(15, 23, 42, 0.95) 0px, transparent 55%);
+    border-radius: 20px;
+    color: #ffffff;
+    padding: 44px 38px;
+    box-shadow: 0 12px 35px -8px rgba(15, 23, 42, 0.15);
+    margin-bottom: 35px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    animation: heroFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-section::after {
+    content: "🏥";
+    position: absolute;
+    right: 25px;
+    bottom: -35px;
+    font-size: 170px;
+    opacity: 0.04;
+    pointer-events: none;
+    transition: transform 0.6s ease;
+}
+
+.hero-section:hover::after {
+    transform: scale(1.05) rotate(-2deg);
+}
+
+.hero-tagline {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(4px);
+    transition: transform 0.2s ease;
+}
+
+.hero-tagline:hover {
+    transform: scale(1.03);
+    color: #ffffff;
+}
+
+.hero-content h1 {
+    font-size: 35px;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    color: #ffffff;
+}
+
+.hero-content p {
+    color: #94a3b8;
+    font-size: 15px;
+    max-width: 680px;
+    margin-bottom: 26px;
+    line-height: 1.6;
+}
+
+/* Multi-field Search Card */
+.search-box-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+}
+
+.search-inputs-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.field-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.input-with-icon input,
+.input-with-icon select {
+    width: 100%;
+    padding: 11px 12px 11px 36px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13.5px;
+    background: #f8fafc;
+    color: #0f172a;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.input-with-icon input:focus,
+.input-with-icon select:focus {
+    border-color: #0f172a;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.search-submit-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Primary Search Button with Hover Zoom */
+.btn-primary-search {
+    background: #0f172a;
+    color: #ffffff;
+    border: 1px solid #0f172a;
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease,
+                box-shadow 0.24s ease;
+}
+
+.btn-primary-search:hover {
+    transform: scale(1.04) translateY(-1px);
+    background: #1e293b;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+}
+
+.btn-primary-search:active {
+    transform: scale(0.97);
+}
+
+/* Reset Search Button with Hover Zoom */
+.btn-reset-search {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease;
+}
+
+.btn-reset-search:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #cbd5e1;
+    transform: scale(1.04);
+}
+
+.btn-reset-search:active {
+    transform: scale(0.96);
+}
+
+/* ------------------------------------
+   Speciality Chips Section (Tabs with Hover Zooming)
+------------------------------------ */
+.speciality-chips-section {
+    margin-bottom: 34px;
+}
+
+.section-header {
+    margin-bottom: 14px;
+}
+
+.section-header h2 {
+    font-size: 20px;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.section-header p {
+    font-size: 13.5px;
+    color: #64748b;
+}
+
+.chips-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 4px 2px 10px;
+    scroll-behavior: smooth;
+}
+
+.chips-container::-webkit-scrollbar {
+    height: 5px;
+}
+
+.chips-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* SPECIALITY TAB CHIP: NORDIC HOVER ZOOM */
+.chip {
+    white-space: nowrap;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #33415c;
+    padding: 8px 18px;
+    border-radius: 24px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transform-origin: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.24s ease;
+}
+
+/* Hover Zoom on Speciality Tab */
+.chip:hover {
+    transform: scale(1.06) translateY(-2px);
+    border-color: #0f172a;
+    color: #0f172a;
+    background: #f8fafc;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Active State on Speciality Tab */
+.chip.active {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.22);
+    transform: scale(1.04);
+}
+
+.chip.active:hover {
+    transform: scale(1.08) translateY(-2px);
+    background: #1e293b;
+    border-color: #1e293b;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.28);
+}
+
+.chip:active {
+    transform: scale(0.95);
+}
+
+/* ------------------------------------
+   AI Assistant Banner Card (Refined Minimalist)
+------------------------------------ */
+.ai-banner-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 26px 28px;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 26px;
+    align-items: center;
+    margin-bottom: 38px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.ai-banner-card:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.ai-badge {
+    display: inline-block;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.2px;
+}
+
+.ai-banner-content h3 {
+    color: #0f172a;
+    font-size: 20px;
+    margin-bottom: 6px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.ai-banner-content p {
+    color: #64748b;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+/* AI Launch Button with Hover Zoom */
+.btn-ai-launch {
+    background: #0f172a;
+    color: #ffffff;
+    border: 1px solid #0f172a;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transform-origin: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease,
+                box-shadow 0.24s ease;
+}
+
+.btn-ai-launch:hover {
+    transform: scale(1.05) translateY(-1px);
+    background: #1e293b;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+}
+
+.btn-ai-launch:active {
+    transform: scale(0.96);
+}
+
+.ai-banner-illustration {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ai-bubble {
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 12px 12px 12px 2px;
+    font-size: 12.5px;
+    color: #33415c;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #0f172a;
+    transition: transform 0.2s ease;
+}
+
+.ai-bubble:hover {
+    transform: translateX(3px);
+}
+
+.ai-response-preview {
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px 12px 2px 12px;
+    font-size: 12.5px;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    transition: transform 0.2s ease;
+}
+
+.ai-response-preview:hover {
+    transform: translateX(-3px);
+}
+
+/* ------------------------------------
+   Hospitals Section & Toolbar (Segmented Tabs)
+------------------------------------ */
+.hospitals-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.results-meta h2 {
+    font-size: 22px;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.results-meta span {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Quick Filter Segmented Control */
+.quick-filter-toggles {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+/* QUICK FILTER TAB: NORDIC HOVER ZOOM */
+.filter-toggle {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+/* Hover Zoom on Filter Tab */
+.filter-toggle:hover {
+    transform: scale(1.05) translateY(-1px);
+    background: rgba(255, 255, 255, 0.7);
+    color: #0f172a;
+}
+
+/* Active State on Filter Tab */
+.filter-toggle.active {
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-color: rgba(226, 232, 240, 0.8);
+    transform: scale(1.02);
+}
+
+.filter-toggle.active:hover {
+    transform: scale(1.05) translateY(-1px);
+}
+
+.filter-toggle:active {
+    transform: scale(0.96);
+}
+
+/* ------------------------------------
+   Compact & Refined Hospital Cards Grid
+------------------------------------ */
+.hospital-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+/* COMPACT HOSPITAL CARD */
+.hospital-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: cardFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    transform-origin: center;
+    transition: transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.26s cubic-bezier(0.2, 0.8, 0.2, 1),
+                border-color 0.26s ease;
+}
+
+/* Hover Zoom & Elevation */
+.hospital-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    border-color: #cbd5e1;
+}
+
+.card-header {
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.card-top-badges {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.badge-tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 5px;
+    letter-spacing: 0.2px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.hospital-card:hover .badge-tag {
+    transform: scale(1.03);
+}
+
+.badge-nabh {
+    background: #f1f5f9;
+    color: #33415c;
+    border: 1px solid #e2e8f0;
+}
+
+.badge-emergency {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #d1fae5;
+}
+
+.rating-badge {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fef3c7;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.hospital-name {
+    font-size: 17px;
+    color: #0f172a;
+    margin-bottom: 3px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.3px;
+    transition: color 0.2s ease;
+}
+
+.hospital-card:hover .hospital-name {
+    color: #0284c7;
+}
+
+.hospital-loc {
+    font-size: 12.5px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-body {
+    padding: 14px 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.specialities-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Speciality Pill with Hover Zoom */
+.spec-pill {
+    background: #f8fafc;
+    color: #33415c;
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+    transform-origin: center;
+}
+
+.spec-pill:hover {
+    transform: scale(1.06);
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.card-pricing-row {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.hospital-card:hover .card-pricing-row {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+.price-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-label {
+    font-size: 10.5px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.price-val {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.card-footer {
+    padding: 12px 20px;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Book Button with Hover Zoom */
+.btn-book {
+    flex: 1;
+    background: #0f172a;
+    color: #ffffff;
+    border: 1px solid #0f172a;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease,
+                box-shadow 0.24s ease;
+}
+
+.btn-book:hover {
+    transform: scale(1.03) translateY(-1px);
+    background: #1e293b;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+}
+
+.btn-book:active {
+    transform: scale(0.96);
+}
+
+/* Compare Button with Hover Zoom */
+.btn-add-compare {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #33415c;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transform-origin: center;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.btn-add-compare:hover {
+    transform: scale(1.03) translateY(-1px);
+    border-color: #0f172a;
+    color: #0f172a;
+    background: #f8fafc;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.btn-add-compare.added {
+    background: #f1f5f9;
+    border-color: #0f172a;
+    color: #0f172a;
+}
+
+.btn-add-compare:active {
+    transform: scale(0.96);
+}
+
+/* Fallback & No Results */
+.no-results {
+    text-align: center;
+    padding: 44px 20px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px dashed #cbd5e1;
+    margin-top: 16px;
+    animation: cardFadeIn 0.4s ease;
+}
+
+.no-results-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.no-results h3 {
+    font-size: 18px;
+    color: #0f172a;
+    margin-bottom: 5px;
+}
+
+.no-results p {
+    font-size: 13.5px;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+/* ------------------------------------
+   Bottom Sticky Compare Dock (Refined Hairline)
+------------------------------------ */
+.compare-dock {
+    position: fixed;
+    bottom: -110px;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    border-top: 2px solid #0f172a;
+    z-index: 100;
+    transition: bottom 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 14px 20px;
+}
+
+.compare-dock.visible {
+    bottom: 0;
+}
+
+.compare-dock-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.compare-dock-info strong {
+    font-size: 14px;
+    color: #0f172a;
+    display: block;
+}
+
+.compare-dock-info span {
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+.compare-dock-items {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Compare Pill with Hover Zoom */
+.compare-pill {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.compare-pill:hover {
+    transform: scale(1.04);
+    border-color: #cbd5e1;
+}
+
+.compare-pill-remove {
+    cursor: pointer;
+    font-weight: 800;
+    color: #991b1b;
+    transition: transform 0.2s ease;
+}
+
+.compare-pill-remove:hover {
+    transform: scale(1.3) rotate(90deg);
+}
+
+.compare-dock-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-view-compare {
+    background: #0f172a;
+    color: #ffffff;
+    border: 1px solid #0f172a;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.btn-view-compare:hover {
+    transform: scale(1.05) translateY(-1px);
+    background: #1e293b;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+}
+
+.btn-view-compare:active {
+    transform: scale(0.96);
+}
+
+.btn-clear-compare {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+}
+
+.btn-clear-compare:hover {
+    transform: scale(1.04);
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.btn-clear-compare:active {
+    transform: scale(0.96);
+}
+
+/* ------------------------------------
+   Comparison & Booking Modals (Nordic Minimalism)
+------------------------------------ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-card {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 860px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e2e8f0;
+    animation: modalZoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-card.small-modal {
+    max-width: 460px;
+}
+
+.modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2,
+.modal-header h3 {
+    font-size: 18px;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    color: #991b1b;
+    transform: scale(1.15) rotate(90deg);
+}
+
+.modal-body {
+    padding: 22px;
+}
+
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.compare-table th,
+.compare-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.compare-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    width: 25%;
+}
+
+.compare-table td {
+    color: #0f172a;
+}
+
+.booking-sub {
+    font-size: 13.5px;
+    color: #0284c7;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+#booking-form label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+#booking-form input,
+#booking-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13.5px;
+    outline: none;
+    background: #f8fafc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#booking-form input:focus,
+#booking-form select:focus {
+    border-color: #0f172a;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.btn-confirm-booking {
+    width: 100%;
+    margin-top: 20px;
+    background: #0f172a;
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease,
+                box-shadow 0.24s ease;
+}
+
+.btn-confirm-booking:hover {
+    transform: scale(1.03) translateY(-1px);
+    background: #1e293b;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+}
+
+.btn-confirm-booking:active {
+    transform: scale(0.97);
+}
+
+/* ------------------------------------
+   Floating AI Assistant Chat Widget
+------------------------------------ */
+.ai-widget-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 500;
+}
+
+/* Floating AI Button with Continuous Breathing & Hover Zoom */
+.ai-float-btn {
+    background: #0f172a;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 12px 20px;
+    border-radius: 36px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transform-origin: center;
+    animation: floatBreathing 3.6s infinite ease-in-out;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.25s ease,
+                background 0.2s ease;
+}
+
+.ai-float-btn:hover {
+    transform: scale(1.08) translateY(-4px) !important;
+    background: #1e293b;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.35) !important;
+}
+
+.ai-float-btn:active {
+    transform: scale(0.96) !important;
+}
+
+.ai-icon {
+    font-size: 18px;
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ai-float-btn:hover .ai-icon {
+    transform: scale(1.15) rotate(8deg);
+}
+
+/* AI Chat Window */
+.ai-chat-window {
+    position: absolute;
+    bottom: 65px;
+    right: 0;
+    width: 370px;
+    height: 500px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.16);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    animation: chatWindowPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ai-chat-window.open {
+    display: flex;
+}
+
+.chat-header {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.chat-avatar {
+    font-size: 20px;
+}
+
+.status-online {
+    display: block;
+    font-size: 10.5px;
+    color: #4ade80;
+}
+
+.chat-close-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.chat-close-btn:hover {
+    transform: scale(1.15) rotate(90deg);
+    opacity: 0.8;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8fafc;
+}
+
+.chat-bubble {
+    max-width: 85%;
+    padding: 11px 14px;
+    border-radius: 14px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    animation: bubbleSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-bubble.ai {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+    align-self: flex-start;
+    border-bottom-left-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.chat-bubble.ai ul {
+    margin: 6px 0 0 14px;
+}
+
+.chat-bubble.user {
+    background: #0f172a;
+    color: #ffffff;
+    align-self: flex-end;
+    border-bottom-right-radius: 3px;
+}
+
+/* Chat Quick Suggestion Chips (Hover Zooming) */
+.chat-quick-suggestions {
+    padding: 8px 12px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.chat-quick-suggestions button {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    padding: 5px 11px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease;
+}
+
+.chat-quick-suggestions button:hover {
+    transform: scale(1.06) translateY(-1px);
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.chat-quick-suggestions button:active {
+    transform: scale(0.95);
+}
+
+.chat-input-form {
+    display: flex;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    gap: 8px;
+}
+
+.chat-input-form input {
+    flex: 1;
+    padding: 9px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    font-size: 12.5px;
+    outline: none;
+    background: #f8fafc;
+    transition: border-color 0.2s ease;
+}
+
+.chat-input-form input:focus {
+    border-color: #0f172a;
+    background: #ffffff;
+}
+
+.chat-send-btn {
+    background: #0f172a;
+    color: #ffffff;
+    border: none;
+    padding: 0 16px;
+    border-radius: 18px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.chat-send-btn:hover {
+    transform: scale(1.05);
+    background: #1e293b;
+}
+
+.chat-send-btn:active {
+    transform: scale(0.95);
+}
+
+/* ------------------------------------
+   Nordic Minimalist Footer
+------------------------------------ */
+.footer {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 50px 20px 26px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 36px;
+    margin-bottom: 36px;
+}
+
+.footer-col .logo {
+    color: #ffffff;
+    margin-bottom: 14px;
+}
+
+.footer-col p {
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #94a3b8;
+}
+
+.footer-col h4 {
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 16px;
+    font-weight: 700;
+}
+
+.footer-col ul {
+    list-style: none;
+}
+
+.footer-col ul li {
+    margin-bottom: 8px;
+}
+
+.footer-col ul li a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 12.5px;
+    display: inline-block;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-col ul li a:hover {
+    color: #ffffff;
+    transform: translateX(3px);
+}
+
+.footer-bottom {
+    max-width: 1240px;
+    margin: 0 auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 18px;
+    text-align: center;
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+/* ------------------------------------
+   Responsive Adjustments
+------------------------------------ */
+@media (max-width: 1024px) {
+    .search-inputs-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .ai-banner-card {
+        grid-template-columns: 1fr;
+    }
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav-links {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        gap: 6px;
+    }
+    .nav-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .hero-content h1 {
+        font-size: 26px;
+    }
+    .search-inputs-grid {
+        grid-template-columns: 1fr;
+    }
+    .hospital-grid {
+        grid-template-columns: 1fr;
+    }
+    .ai-chat-window {
+        width: 310px;
+        right: -10px;
+    }
+    .footer-container {
+        grid-template-columns: 1fr;
+    }
+    .compare-dock-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

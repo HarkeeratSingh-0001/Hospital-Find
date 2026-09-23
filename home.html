@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalCare - Find, Compare & Book Top Hospitals</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+    <!-- Emergency Toll-Free Alert Banner -->
+    <div class="emergency-bar">
+        <div class="emergency-content">
+            <span>🚨 <strong>24/7 Emergency Medical Support:</strong> Dial <strong>108</strong> (Ambulance) or <strong>1800-200-CARE</strong></span>
+            <a href="tel:108" class="emergency-call-btn">Emergency Call</a>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="home.html" class="logo">
+                <span class="logo-icon">🏥</span>
+                <span class="logo-text">VitalCare</span>
+            </a>
+
+            <nav class="nav-links" id="main-nav">
+                <a href="#search-section" class="nav-btn active">Find Hospitals</a>
+                <a href="#specialities" class="nav-btn">Specialities</a>
+                <a href="#hospitals" class="nav-btn">Top Rated</a>
+                <a href="#ai-assistant" class="nav-btn" id="nav-ai-btn">AI Assistant <span class="badge-ai">New</span></a>
+            </nav>
+
+            <div class="nav-actions">
+                <!-- Compare Counter Button -->
+                <button class="compare-nav-btn" id="open-compare-btn" title="View Hospital Comparison">
+                    ⚖️ Compare (<span id="compare-count">0</span>)
+                </button>
+
+                <!-- User Profile / City Welcome (Populated after registration) -->
+                <div class="user-profile">
+                    <div class="avatar" id="user-avatar">HC</div>
+                    <div class="user-details">
+                        <span class="user-name" id="user-display-name">Welcome!</span>
+                        <span class="user-location" id="user-display-city">📍 Mohali</span>
+                    </div>
+                    <a href="index.html" class="logout-btn" title="Change Account / Log out">Log out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-wrapper">
+
+        <!-- Hero Section with Integrated Search -->
+        <section class="hero-section" id="search-section">
+            <div class="hero-content">
+                <div class="hero-tagline">Verified Healthcare Provider Network</div>
+                <h1>Find the Right Hospital &amp; Doctor For You.</h1>
+                <p>Compare treatment costs, available ICU facilities, real-time bed count, and verified patient ratings across trusted hospitals.</p>
+                
+                <!-- Advanced Multi-Filter Search Bar -->
+                <div class="search-box-card">
+                    <form id="hospital-search-form" onsubmit="event.preventDefault(); (window.applyFilters || fetchHospitalsFromServer)();">
+                        <div class="search-inputs-grid">
+                            
+                            <!-- Search by Name or Treatment -->
+                            <div class="input-field">
+                                <label for="search-input">Search Hospital By Name</label>
+                                <div class="input-with-icon">
+                                    <span class="field-icon">🔍</span>
+                                    <input 
+                                        type="text" 
+                                        id="search-input" 
+                                        placeholder="e.g. PGIMER, etc"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- City Dropdown -->
+                            <div class="input-field">
+                                <label for="city-filter">Location / City</label>
+                                <div class="input-with-icon">
+                                    <span class="field-icon">📍</span>
+                                    <select id="city-filter">
+                                        <option value="">All Cities / Regions</option>
+                                        <option value="Abohar">Abohar</option>
+                                        <option value="Amritsar">Amritsar</option>
+                                        <option value="Barnala">Barnala</option>
+                                        <option value="Bathinda">Bathinda</option>
+                                        <option value="Chandigarh">Chandigarh (Tricity / Mohali)</option>
+                                        <option value="Faridkot">Faridkot</option>
+                                        <option value="Fatehgarh Sahib">Fatehgarh Sahib</option>
+                                        <option value="Fazilka">Fazilka</option>
+                                        <option value="Firozpur">Firozpur</option>
+                                        <option value="Gurdaspur">Gurdaspur</option>
+                                        <option value="Hoshiarpur">Hoshiarpur</option>
+                                        <option value="Jalandhar">Jalandhar</option>
+                                        <option value="Kapurthala">Kapurthala</option>
+                                        <option value="Khanna">Khanna</option>
+                                        <option value="Ludhiana">Ludhiana</option>
+                                        <option value="Malerkotla">Malerkotla</option>
+                                        <option value="Mansa">Mansa</option>
+                                        <option value="Moga">Moga</option>
+                                        <option value="Mohali">Mohali (SAS Nagar)</option>
+                                        <option value="Muktsar">Muktsar</option>
+                                        <option value="Nawanshahr">Nawanshahr</option>
+                                        <option value="Pathankot">Pathankot</option>
+                                        <option value="Patiala">Patiala</option>
+                                        <option value="Phagwara">Phagwara</option>
+                                        <option value="Rajpura">Rajpura</option>
+                                        <option value="Rupnagar">Rupnagar</option>
+                                        <option value="Sangrur">Sangrur</option>
+                                        <option value="Tarn Taran">Tarn Taran</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Speciality Dropdown -->
+                            <div class="input-field">
+                                <label for="speciality-filter">Speciality</label>
+                                <div class="input-with-icon">
+                                    <span class="field-icon">🩺</span>
+                                    <select id="speciality-filter">
+                                        <option value="">All Specialities</option>
+                                        <option value="Cardiology">Cardiology (Heart)</option>
+                                        <option value="General Surgery">General Surgery (Surgical)</option>
+                                        <option value="Orthopedics">Orthopedics (Bones &amp; Joints)</option>
+                                        <option value="Neurology">Neurology (Brain &amp; Nerves)</option>
+                                        <option value="Oncology">Oncology (Cancer Care)</option>
+                                        <option value="Pediatrics">Pediatrics (Child Care)</option>
+                                        <option value="Nephrology">Nephrology (Kidney)</option>
+                                        <option value="Gastroenterology">Gastroenterology (Digestive)</option>
+                                        <option value="ENT">ENT (Ear, Nose &amp; Throat)</option>
+                                        <option value="Dermatology">Dermatology (Skin)</option>
+                                        <option value="General Medicine">General Medicine (Physician)</option>
+                                        <option value="Gynecology">Gynecology (Women's Health)</option>
+                                        <option value="Ophthalmology">Ophthalmology (Eye Care)</option>
+                                        <option value="Pulmonology">Pulmonology (Lungs &amp; Chest)</option>
+                                        <option value="Urology">Urology (Urinary Care)</option>
+                                        <option value="Emergency">24x7 Emergency / Trauma</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Price / Budget Tier -->
+                            <div class="input-field">
+                                <label for="budget-filter">Est. Consultation Fee</label>
+                                <div class="input-with-icon">
+                                    <span class="field-icon">💳</span>
+                                    <select id="budget-filter">
+                                        <option value="">Any Range</option>
+                                        <option value="budget">Under ₹500 (Affordable)</option>
+                                        <option value="mid">₹500 - ₹1,000 (Standard)</option>
+                                        <option value="premium">₹1,000+ (Super Speciality)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="search-submit-row">
+                            <button type="submit" class="btn-primary-search">
+                                <span>Search Hospitals</span>
+                            </button>
+                            <button type="button" class="btn-reset-search" onclick="resetFilters()">
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Speciality Carousel / Filter Chips -->
+        <section class="speciality-chips-section" id="specialities">
+            <div class="section-header">
+                <h2>Browse by Medical Speciality</h2>
+                <p>Select a category to filter hospitals instantly by highest success rate</p>
+            </div>
+            
+            <div class="chips-container" id="speciality-chips">
+                <button class="chip active" data-spec="">All</button>
+                <button class="chip" data-spec="Cardiology">🫀 Cardiology</button>
+                <button class="chip" data-spec="General Surgery">🩺 General Surgery</button>
+                <button class="chip" data-spec="Neurology">🧠 Neurology</button>
+                <button class="chip" data-spec="Orthopedics">🦴 Orthopedics</button>
+                <button class="chip" data-spec="Oncology">🔬 Oncology</button>
+                <button class="chip" data-spec="Pediatrics">👶 Pediatrics</button>
+                <button class="chip" data-spec="Nephrology">🩸 Nephrology</button>
+                <button class="chip" data-spec="Gastroenterology">🍽️ Gastroenterology</button>
+                <button class="chip" data-spec="ENT">👂 ENT</button>
+            </div>
+        </section>
+
+        <!-- AI Assistant Banner Callout -->
+        <section class="ai-banner-card">
+            <div class="ai-banner-content">
+                <div class="ai-badge">✨ AI-Powered Guidance</div>
+                <h3>Unsure which hospital or doctor is right for your symptoms?</h3>
+                <p>Chat with our AI Hospital Assistant to get instant triage advice, specialist recommendations, and estimated treatment budgets in your city.</p>
+                <button class="btn-ai-launch" onclick="toggleAIChat(true)">
+                    🤖 Talk with AI Assistant
+                </button>
+            </div>
+            <div class="ai-banner-illustration">
+                <div class="ai-bubble">"Where can I find top success-rate cardiac care in Punjab?"</div>
+                <div class="ai-response-preview">
+                    <strong>AI Recommendation:</strong> Lifeline Medical Centre (80.9%) and Apex Medical Centre (81.3%) have the highest verified success rates in our database.
+                </div>
+            </div>
+        </section>
+
+        <!-- Hospitals Section -->
+        <section class="hospitals-section" id="hospitals">
+            <div class="hospitals-toolbar">
+                <div class="results-meta">
+                    <h2 id="results-count-heading">Available Hospitals</h2>
+                    <span id="results-subtext">Ordered by Highest Success Rate • Verified Patients Treated</span>
+                </div>
+
+                <!-- Fast Filter Pills -->
+                <div class="quick-filter-toggles">
+                    <button class="filter-toggle active" data-filter="all">All Hospitals</button>
+                    <button class="filter-toggle" data-filter="nabh">🎯 Top Success Rate (80%+)</button>
+                    <button class="filter-toggle" data-filter="icu">⚡ 24/7 ICU &amp; Emergency</button>
+                    <button class="filter-toggle" data-filter="cashless">👥 High Patient Volume</button>
+                </div>
+            </div>
+
+            <!-- Hospital Cards Grid Container (Populated dynamically) -->
+            <div class="hospital-grid" id="hospitals-container"></div>
+
+            <!-- No Results Fallback -->
+            <div class="no-results" id="no-results-msg" style="display: none;">
+                <div class="no-results-icon">🏥🔍</div>
+                <h3>No hospitals matched your search criteria</h3>
+                <p>Try clearing your filters or selecting a different city or medical department.</p>
+                <button class="btn-reset-search" onclick="resetFilters()">View All Hospitals</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Sticky Hospital Comparison Drawer -->
+    <div class="compare-dock" id="compare-dock">
+        <div class="compare-dock-inner">
+            <div class="compare-dock-info">
+                <strong>Hospital Comparison Tray</strong>
+                <span id="compare-dock-text">0 of 3 hospitals selected</span>
+            </div>
+            <div class="compare-dock-items" id="compare-dock-list"></div>
+            <div class="compare-dock-actions">
+                <button class="btn-view-compare" onclick="openCompareModal()">Compare Now</button>
+                <button class="btn-clear-compare" onclick="clearComparison()">Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div class="modal-overlay" id="compare-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Hospital Comparison</h2>
+                <button class="modal-close-btn" onclick="closeCompareModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="compare-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Floating AI Assistant Chat Widget -->
+    <div class="ai-widget-container" id="ai-assistant">
+        <!-- Floating Trigger Button -->
+        <button class="ai-float-btn" id="ai-float-trigger" onclick="toggleAIChat()" title="Ask HospitalConnect AI">
+            <span class="ai-icon">🤖</span>
+            <span class="ai-label">AI Assistant</span>
+        </button>
+
+        <!-- Floating Chatbox Window -->
+        <div class="ai-chat-window" id="ai-chat-window">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <span class="chat-avatar">🏥🤖</span>
+                    <div>
+                        <strong>HospitalConnect AI</strong>
+                        <span class="status-online">● Online &amp; Ready</span>
+                    </div>
+                </div>
+                <button class="chat-close-btn" onclick="toggleAIChat(false)">&times;</button>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-bubble ai">
+                    Hello! I'm your HospitalConnect AI guide. How can I help you today?
+                    <br><br>
+                    You can ask about:
+                    <ul>
+                        <li>Best hospitals for specific treatments</li>
+                        <li>Estimated surgery costs</li>
+                        <li>Insurance coverage &amp; emergency care</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="chat-quick-suggestions">
+                <button onclick="sendQuickPrompt('Find best cardiology hospital in Mohali')">Cardiology in Mohali</button>
+                <button onclick="sendQuickPrompt('Average cost of knee replacement surgery?')">Knee Surgery Cost</button>
+                <button onclick="sendQuickPrompt('Which hospitals provide 24/7 emergency & cashless mediclaim?')">24/7 Emergency</button>
+            </div>
+
+            <form class="chat-input-form" onsubmit="event.preventDefault(); handleSendChatMessage();">
+                <input 
+                    type="text" 
+                    id="chat-user-input" 
+                    placeholder="Describe symptoms or ask about a hospital..." 
+                    autocomplete="off"
+                >
+                <button type="submit" class="chat-send-btn">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal-overlay" id="booking-modal">
+        <div class="modal-card small-modal">
+            <div class="modal-header">
+                <h3 id="booking-hospital-name">Book Appointment</h3>
+                <button class="modal-close-btn" onclick="closeBookingModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="booking-hospital-sub" class="booking-sub">Selected Hospital</p>
+                <form id="booking-form" onsubmit="handleConfirmBooking(event)">
+                    <label>Patient Name</label>
+                    <input type="text" id="book-patient-name" required placeholder="Enter patient name">
+
+                    <label>Contact Phone</label>
+                    <input type="tel" id="book-patient-phone" required placeholder="Enter mobile number">
+
+                    <label>Preferred Date</label>
+                    <input type="date" id="book-patient-date" required>
+
+                    <label>Department / Speciality</label>
+                    <select id="book-patient-spec" required>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                    </select>
+
+                    <button type="submit" class="btn-confirm-booking">Confirm Appointment Request</button>
+                </form>
+                <div id="booking-success-msg" class="success" style="display:none; margin-top:15px;">
+                    ✅ Appointment requested! The hospital desk will call you shortly to confirm the slot.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="logo">🏥 HospitalConnect</div>
+                <p>Empowering patients to make informed healthcare decisions through transparent pricing, verified facilities, and intelligent hospital matching.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#search-section">Search Hospitals</a></li>
+                    <li><a href="#specialities">Specialities Directory</a></li>
+                    <li><a href="javascript:void(0)" onclick="openCompareModal()">Compare Hospitals</a></li>
+                    <li><a href="javascript:void(0)" onclick="toggleAIChat(true)">AI Health Matcher</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Network Regions</h4>
+                <ul>
+                    <li><a href="javascript:void(0)" onclick="filterByCity('Mohali')">Mohali</a></li>
+                    <li><a href="javascript:void(0)" onclick="filterByCity('Chandigarh')">Chandigarh</a></li>
+                    <li><a href="javascript:void(0)" onclick="filterByCity('Ludhiana')">Ludhiana</a></li>
+                    <li><a href="javascript:void(0)" onclick="filterByCity('Amritsar')">Amritsar</a></li>
+                    <li><a href="javascript:void(0)" onclick="filterByCity('Jalandhar')">Jalandhar</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Emergency Contact</h4>
+                <p>Ambulance Service: <strong>108</strong></p>
+                <p>State Medical Helpline: <strong>104</strong></p>
+                <p>Support: <strong>care@hospitalconnect.in</strong></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 HospitalConnect. All rights reserved. For informational purposes only. In life-threatening emergencies, please call 108 or go to the nearest emergency ward.</p>
+        </div>
+    </footer>
+
+    <!-- Home Page Logic -->
+    <script src="home.js"></script>
+    <script>
+        (function () {
+            // Connect frontend to the local server
+            const API_BASE = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
+                ? window.location.origin
+                : 'http://127.0.0.1:8000';
+
+            const hospitalListEl = document.getElementById('hospitals-container');
+            const noResultsEl = document.getElementById('no-results-msg');
+            const resultsHeadingEl = document.getElementById('results-count-heading');
+            const resultsSubtextEl = document.getElementById('results-subtext');
+
+            function renderHospitalCards(hospitals) {
+                if (!hospitalListEl) return;
+
+                hospitalListEl.innerHTML = '';
+
+                if (!Array.isArray(hospitals) || hospitals.length === 0) {
+                    if (noResultsEl) noResultsEl.style.display = 'block';
+                    if (resultsHeadingEl) resultsHeadingEl.textContent = 'No Hospitals Found';
+                    if (resultsSubtextEl) resultsSubtextEl.textContent = 'Try changing the search filters.';
+                    return;
+                }
+
+                // Normalize data and sort strictly by success rate descending
+                const normalized = hospitals.map(h => ({
+                    id: h.id || ((h.hospital_name || h.name || 'hosp') + '-' + (h.district || h.city || '')).toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                    name: h.hospital_name || h.name || 'Hospital',
+                    city: h.city || 'Punjab',
+                    district: h.district || '',
+                    speciality: h.speciality || h.specialization || h.department || 'General Care',
+                    rating: Number(h.hospital_rating || h.rating || 4.5) || 4.5,
+                    success_rate: Number(h.success_rate || 0) || 0,
+                    no_of_patients_treated: Number(h.no_of_patients_treated || 0) || 0,
+                    overall_rank: h.overall_rank || '',
+                    speciality_rank: h.speciality_rank || '',
+                    service_readiness: Number(h.service_readiness_pct || 0) || 0
+                }));
+
+                // Sort by success rate in descending order
+                normalized.sort((a, b) => b.success_rate - a.success_rate);
+
+                // Store for compare modal
+                window.allLoadedHospitals = normalized;
+
+                if (noResultsEl) noResultsEl.style.display = 'none';
+                if (resultsHeadingEl) resultsHeadingEl.textContent = `Available Hospitals (${normalized.length})`;
+                if (resultsSubtextEl) resultsSubtextEl.textContent = 'Ordered by Success Rate (Highest to Lowest) • Showing Patients Treated';
+
+                // Display top results (up to 120 for smooth performance)
+                const toShow = normalized.slice(0, 120);
+
+                toShow.forEach((hospital, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'hospital-card';
+                    card.style.animationDelay = `${(index % 12) * 0.04}s`;
+                    card.setAttribute('data-id', hospital.id);
+
+                    const locationText = hospital.city && hospital.district && hospital.city !== hospital.district
+                        ? `${hospital.city}, ${hospital.district}`
+                        : (hospital.city || hospital.district || 'Punjab');
+
+                    const safeName = (hospital.name || 'Hospital').replace(/'/g, "\\'");
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="card-top-badges">
+                                <div>
+                                    <span class="badge-tag badge-nabh">#${index + 1} Success Rank</span>
+                                    <span class="badge-tag badge-emergency" style="margin-left: 4px;">🎯 ${hospital.success_rate}% Success</span>
+                                </div>
+                                <div class="rating-badge">★ ${hospital.rating.toFixed(1)}</div>
+                            </div>
+                            <h3 class="hospital-name">${hospital.name}</h3>
+                            <div class="hospital-loc">📍 ${locationText}</div>
+                        </div>
+
+                        <div class="card-body">
+                            <div>
+                                <div class="price-label" style="margin-bottom: 6px;">Speciality</div>
+                                <div class="specialities-tags">
+                                    <span class="spec-pill">${hospital.speciality}</span>
+                                </div>
+                            </div>
+
+                            <div class="card-pricing-row">
+                                <div class="price-item">
+                                    <span class="price-label">🎯 Success Rate</span>
+                                    <span class="price-val" style="color: #047857; font-size: 15px;">${hospital.success_rate}%</span>
+                                </div>
+                                <div class="price-item" style="text-align: right;">
+                                    <span class="price-label">👥 Patients Treated</span>
+                                    <span class="price-val" style="color: #0f172a; font-size: 15px;">${hospital.no_of_patients_treated.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <button class="btn-book" onclick="openBookingModal('${hospital.id}', '${safeName}', '${hospital.city}')">
+                                Book Appointment
+                            </button>
+                            <button class="btn-add-compare" onclick="toggleCompareHospital('${hospital.id}')">
+                                + Compare
+                            </button>
+                        </div>
+                    `;
+                    hospitalListEl.appendChild(card);
+                });
+            }
+
+            function parseCsvHospitals(csvText) {
+                const lines = csvText.trim().split(/\r?\n/).filter(Boolean);
+                if (!lines.length) return [];
+
+                const headers = lines[0].split(',').map((header) => header.trim().replace(/^"|"$/g, ''));
+                const rows = lines.slice(1).map((line) => {
+                    const values = line.match(/("[^"]*(?:""[^"]*)*"|[^,]+)/g) || [];
+                    const normalized = values.map((value) => value.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = normalized[index] ?? '';
+                    });
+                    return row;
+                });
+
+                const parsed = rows.map((row) => ({
+                    id: ((row.hospital_name || row.name || 'hosp') + '-' + (row.district || row.city || '')).toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                    hospital_name: row.hospital_name || row.name || row.hospital || 'Hospital',
+                    name: row.hospital_name || row.name || row.hospital || 'Hospital',
+                    city: row.city || row.City || 'Unknown City',
+                    district: row.district || row.District || '',
+                    speciality: row.speciality || row.specialization || row.department || 'General Care',
+                    hospital_rating: Number(row.hospital_rating || row.rating || row.Rating || 4.5) || 4.5,
+                    rating: Number(row.hospital_rating || row.rating || row.Rating || 4.5) || 4.5,
+                    success_rate: Number(row.success_rate || row['success rate'] || 0) || 0,
+                    no_of_patients_treated: Number(row.no_of_patients_treated || row['no of patients treated'] || 0) || 0,
+                    service_readiness_pct: Number(row.service_readiness_pct || 0) || 0,
+                    ranking_score: Number(row.ranking_score || 0) || 0,
+                    overall_rank: row.overall_rank || '',
+                    speciality_rank: row.speciality_rank || ''
+                }));
+
+                // Sort descending by success rate
+                parsed.sort((a, b) => b.success_rate - a.success_rate);
+                return parsed;
+            }
+
+            async function fetchHospitalsCsvFallback() {
+                const csvUrl = 'hospitals%202.csv';
+                try {
+                    const response = await fetch(csvUrl, { method: 'GET', credentials: 'same-origin' });
+                    if (!response.ok) throw new Error('CSV fallback unavailable.');
+                    const csvText = await response.text();
+                    const hospitals = parseCsvHospitals(csvText);
+                    if (hospitals.length) {
+                        renderHospitalCards(hospitals);
+                        return;
+                    }
+                    throw new Error('No records found in hospitals 2.csv');
+                } catch (error) {
+                    console.warn('Hospitals CSV fallback failed:', error);
+                    if (typeof window.applyFilters === 'function') {
+                        window.applyFilters();
+                    }
+                    if (resultsHeadingEl) {
+                        resultsHeadingEl.textContent = 'Available Hospitals';
+                    }
+                    if (resultsSubtextEl) {
+                        resultsSubtextEl.textContent = 'Showing locally filtered results';
+                    }
+                }
+            }
+
+            async function fetchHospitalsFromServer() {
+                const searchVal = document.getElementById('search-input')?.value?.trim() || '';
+                const city = document.getElementById('city-filter')?.value || '';
+                const speciality = document.getElementById('speciality-filter')?.value || '';
+                const budget = document.getElementById('budget-filter')?.value || '';
+
+                const params = new URLSearchParams();
+                if (searchVal) params.append('q', searchVal);
+                if (city) params.append('city', city);
+                if (speciality) params.append('speciality', speciality);
+                if (budget) params.append('budget', budget);
+
+                try {
+                    const response = await fetch(`${API_BASE}/api/hospitals?${params.toString()}`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Unable to load hospitals from server.');
+                    }
+
+                    const data = await response.json();
+                    const hospitals = Array.isArray(data) ? data : (data.hospitals || []);
+                    renderHospitalCards(hospitals);
+                } catch (error) {
+                    console.warn('Server fetch fallback:', error);
+                    await fetchHospitalsCsvFallback();
+                }
+            }
+
+            async function submitBookingToServer(event) {
+                event.preventDefault();
+                const bookingForm = document.getElementById('booking-form');
+                if (!bookingForm) return;
+
+                const payload = {
+                    hospital: document.getElementById('booking-hospital-name')?.textContent || 'Hospital',
+                    patient_name: document.getElementById('book-patient-name')?.value,
+                    phone: document.getElementById('book-patient-phone')?.value,
+                    date: document.getElementById('book-patient-date')?.value,
+                    speciality: document.getElementById('book-patient-spec')?.value
+                };
+
+                try {
+                    const response = await fetch(`${API_BASE}/api/book-appointment`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Booking request failed.');
+                    }
+
+                    const successMsg = document.getElementById('booking-success-msg');
+                    if (successMsg) {
+                        successMsg.style.display = 'block';
+                    }
+                    bookingForm.reset();
+                } catch (error) {
+                    console.error('Booking Error:', error);
+                    alert('Unable to send appointment request to the server right now. Please try again.');
+                }
+            }
+
+            async function sendAssistantMessageToServer(prompt) {
+                try {
+                    const response = await fetch(`${API_BASE}/api/ai-chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ message: prompt })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('AI assistant unavailable.');
+                    }
+
+                    const data = await response.json();
+                    const reply = data.reply || data.message || 'I can help you find the right hospital.';
+                    const chatMessages = document.getElementById('chat-messages');
+                    if (chatMessages) {
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'chat-bubble ai';
+                        botMessage.innerHTML = reply;
+                        chatMessages.appendChild(botMessage);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                } catch (error) {
+                    console.warn('AI chat fallback:', error);
+                    if (typeof window.handleSendChatMessage === 'function') {
+                        window.handleSendChatMessage();
+                    }
+                }
+            }
+
+            // NOTE: applyFilters, resetFilters, filterByCity are defined and exported
+            // by home.js (window.applyFilters = applyFilters at end of file).
+            // Do NOT override them here — home.js handles all client-side filtering
+            // using window.ALL_HOSPITALS for accurate, no-blank-screen results.
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Booking form: send to server endpoint
+                const bookingForm = document.getElementById('booking-form');
+                if (bookingForm) {
+                    bookingForm.addEventListener('submit', submitBookingToServer);
+                }
+
+                // AI Chat form: send to server endpoint
+                const chatForm = document.querySelector('.chat-input-form');
+                if (chatForm) {
+                    chatForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        const input = document.getElementById('chat-user-input');
+                        const message = input?.value?.trim();
+                        if (!message) return;
+                        sendAssistantMessageToServer(message);
+                        if (input) input.value = '';
+                    });
+                }
+
+                // Expose server-side helpers globally (used by quick prompts)
+                window.fetchHospitalsFromServer = fetchHospitalsFromServer;
+                window.sendAssistantMessageToServer = sendAssistantMessageToServer;
+
+                // NOTE: Initial hospital load is handled by home.js → loadHospitalDataset()
+                // which fetches from the server API or falls back to the CSV file.
+                // home.js's DOMContentLoaded listener runs first (script tag before this inline block).
+            });
+        })();
+    </script>
+</body>
+</html>
