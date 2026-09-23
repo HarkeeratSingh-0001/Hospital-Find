@@ -417,11 +417,18 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
 
         return super().do_GET()
 
-import os
-
-if __name__ == '__main__':
+if __name__ == "__main__":
+    init_csv()
+    init_hospitals_csv()
     
-    port = int(os.environ.get('PORT', 5000))
-    with socketserver.TCPServer(('0.0.0.0', port), HospitalConnectHandler) as server:
-        print(f"HospitalConnect server running on port {port}")
-        server.serve_forever()
+    # Cloud hosting ke environment variable se PORT uthane ke liye:
+    port = int(os.environ.get("PORT", 8000))
+    
+    socketserver.TCPServer.allow_reuse_address = True
+    with socketserver.TCPServer(("", port), HospitalConnectHandler) as httpd:
+        print("=" * 60)
+        print("🏥 HospitalConnect Server with CSV Database is RUNNING!")
+        print(f"👉 Local Web Address: http://localhost:{port}")
+        print(f"👉 Database File: {CSV_FILE}")
+        print("=" * 60)
+        httpd.serve_forever()
