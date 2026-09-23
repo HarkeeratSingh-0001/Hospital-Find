@@ -362,13 +362,135 @@ function isCityMatch(hospital, filterCity) {
     return false;
 }
 
-// Check if a hospital matches speciality
+// Comprehensive Dictionary mapping common disease names, symptoms & conditions to medical specialities
+const DISEASE_KEYWORDS_MAP = {
+    "Cardiology": [
+        "cardiology", "cardio", "heart attack", "heart failure", "coronary",
+        "angioplasty", "bypass surgery", "bypass", "arrhythmia", "hypertension", "high bp",
+        "blood pressure", "chest pain", "valve replacement", "valve", "pacemaker",
+        "atherosclerosis", "stent", "ecg", "heart"
+    ],
+    "Oncology": [
+        "oncology", "chemotherapy", "chemo", "radiation therapy", "radiation",
+        "breast cancer", "lung cancer", "blood cancer", "leukemia", "lymphoma",
+        "prostate cancer", "tumor", "tumour", "biopsy", "carcinoma", "sarcoma",
+        "melanoma", "malignancy", "oncologist", "cancer"
+    ],
+    "Orthopedics": [
+        "orthopedics", "ortho", "knee replacement", "hip replacement", "bone fracture",
+        "fracture", "osteoarthritis", "arthritis", "slipped disc", "back pain",
+        "spine surgery", "spine", "ligament tear", "ligament", "acl", "joint pain",
+        "joint", "joints", "bones", "bone", "knee", "hip", "shoulder", "orthopedic"
+    ],
+    "Neurology": [
+        "neurology", "neuro", "brain tumor", "brain stroke", "stroke", "paralysis",
+        "epilepsy", "seizures", "migraine", "headache", "parkinson", "parkinsons",
+        "nerve pain", "neuropathy", "alzheimer", "memory loss", "brain", "nerve", "nerves"
+    ],
+    "Nephrology": [
+        "nephrology", "kidney failure", "chronic kidney disease", "ckd", "dialysis",
+        "high creatinine", "creatinine", "kidney transplant", "renal failure",
+        "renal", "nephrologist", "kidney"
+    ],
+    "Urology": [
+        "urology", "kidney stones", "kidney stone", "gall stones", "stones", "stone",
+        "urinary tract infection", "uti", "prostate enlargement", "prostate",
+        "bph", "bladder infection", "bladder", "urinary incontinence", "urine infection", "urine"
+    ],
+    "Gastroenterology": [
+        "gastroenterology", "gastro", "liver cirrhosis", "fatty liver", "hepatitis",
+        "jaundice", "acid reflux", "acidity", "gerd", "gastritis", "endoscopy",
+        "stomach ulcer", "ulcer", "ulcers", "digestive disorders", "digestive",
+        "digestion", "stomach pain", "stomach", "liver", "colon", "gut"
+    ],
+    "Pulmonology": [
+        "pulmonology", "respiratory failure", "respiratory", "asthma", "copd",
+        "pneumonia", "tuberculosis", "tb", "bronchitis", "chest infection",
+        "breathing problem", "breathing", "cough", "wheezing", "lungs", "lung"
+    ],
+    "General Surgery": [
+        "general surgery", "appendicitis", "appendix", "hernia repair", "hernia",
+        "gallbladder surgery", "gallbladder", "laparoscopic surgery", "laparoscopy",
+        "piles", "fistula", "trauma surgery", "operation", "surgery", "surgical"
+    ],
+    "Pediatrics": [
+        "pediatrics", "pediatric", "child care", "children care", "child specialist",
+        "newborn care", "newborn", "infant jaundice", "infant", "baby care", "baby",
+        "nicu", "child vaccination", "vaccination", "pediatrician", "children", "child"
+    ],
+    "Gynecology": [
+        "gynecology", "gynae", "gynecologist", "pregnancy care", "pregnancy",
+        "pregnant", "normal delivery", "c-section", "cesarean", "pcos", "pcod",
+        "infertility", "menstrual disorders", "period pain", "period", "uterus",
+        "ovarian", "womens health", "women health"
+    ],
+    "Dermatology": [
+        "dermatology", "skin allergy", "skin disease", "eczema", "psoriasis",
+        "acne", "pimples", "skin rash", "rash", "rashes", "hair fall", "hair loss",
+        "alopecia", "vitiligo", "fungal infection", "dermatitis", "itching", "dermatologist", "skin"
+    ],
+    "Ophthalmology": [
+        "ophthalmology", "cataract surgery", "cataract", "glaucoma", "lasik surgery",
+        "lasik", "retinal detachment", "retina", "cornea", "eye vision",
+        "vision loss", "eye care", "eye surgery", "ophthalmologist", "eyes", "eye"
+    ],
+    "ENT": [
+        "ear nose throat", "ent", "ear infection", "hearing loss", "deafness",
+        "tonsillitis", "tonsils", "sinusitis", "sinus", "throat infection",
+        "throat pain", "deviated septum", "ear pain", "throat", "nose", "ear"
+    ],
+    "General Medicine": [
+        "general medicine", "internal medicine", "viral fever", "typhoid", "dengue",
+        "malaria", "diabetes", "diabetic", "blood sugar", "sugar", "flu", "cold",
+        "infection", "weakness", "physician", "general physician", "fever"
+    ]
+};
+
+// Flatten and sort keywords by length descending so multi-word keywords match first
+const SORTED_DISEASE_KEYWORDS = [];
+for (const [spec, keywords] of Object.entries(DISEASE_KEYWORDS_MAP)) {
+    for (const kw of keywords) {
+        SORTED_DISEASE_KEYWORDS.push({ spec, kw, len: kw.length });
+    }
+}
+SORTED_DISEASE_KEYWORDS.sort((a, b) => b.len - a.len);
+
+// Detect disease keyword from text query
+function detectDiseaseFromText(query) {
+    if (!query) return { speciality: null, matchedKeyword: null, remainingQuery: "" };
+    const cleanQuery = query.toLowerCase().trim();
+
+    for (const item of SORTED_DISEASE_KEYWORDS) {
+        const escaped = item.kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(^|\\b|\\s)${escaped}(\\b|\\s|$)`, 'i');
+        if (regex.test(cleanQuery)) {
+            const remaining = cleanQuery.replace(regex, ' ').replace(/\s+/g, ' ').trim();
+            return {
+                speciality: item.spec,
+                matchedKeyword: item.kw,
+                remainingQuery: remaining
+            };
+        }
+    }
+    return { speciality: null, matchedKeyword: null, remainingQuery: cleanQuery };
+}
+
+// Check if a hospital matches speciality or disease
 function isSpecialityMatch(hospital, filterSpec) {
     if (!filterSpec || filterSpec === "" || filterSpec.toLowerCase() === "all") return true;
     const target = filterSpec.toLowerCase().trim();
-    const s = (hospital.speciality || "").toLowerCase();
+    const s = (hospital.speciality || "").toLowerCase().trim();
 
-    if (s.includes(target) || target.includes(s)) return true;
+    if (s === target || s.includes(target) || target.includes(s)) return true;
+
+    // Check if target is a known synonym/disease of this hospital's speciality
+    for (const [spec, keywords] of Object.entries(DISEASE_KEYWORDS_MAP)) {
+        if (spec.toLowerCase() === s) {
+            if (keywords.some(k => k === target || target.includes(k) || k.includes(target))) {
+                return true;
+            }
+        }
+    }
 
     if (target.includes("emergency") || target.includes("trauma")) {
         return s.includes("surgery") || s.includes("medicine") || s.includes("cardiology") || s.includes("orthopedics");
@@ -376,80 +498,238 @@ function isSpecialityMatch(hospital, filterSpec) {
     return false;
 }
 
-// Main Filter Function: Always sorts by highest success rate
+// Quick Select a Single Disease (used by chips, dropdown, and card pills)
+function selectDisease(diseaseName) {
+    selectedSpeciality = diseaseName;
+    const specSelect = document.getElementById("speciality-filter");
+    if (specSelect) specSelect.value = diseaseName;
+
+    document.querySelectorAll("#speciality-chips .chip").forEach(c => {
+        c.classList.toggle("active", (c.getAttribute("data-spec") || "").toLowerCase() === (diseaseName || "").toLowerCase());
+    });
+
+    applyFilters();
+
+    const hospSection = document.getElementById("hospitals");
+    if (hospSection) {
+        hospSection.scrollIntoView({ behavior: "smooth" });
+    }
+}
+
+// Clear Single Disease Filter and return to All Diseases view
+function clearDiseaseFilter() {
+    selectedSpeciality = "";
+    const specSelect = document.getElementById("speciality-filter");
+    if (specSelect) specSelect.value = "";
+
+    document.querySelectorAll("#speciality-chips .chip").forEach((c, idx) => {
+        c.classList.toggle("active", idx === 0);
+    });
+
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        const detected = detectDiseaseFromText(searchInput.value);
+        if (detected.speciality) {
+            searchInput.value = detected.remainingQuery;
+        }
+    }
+
+    applyFilters();
+}
+
+// Main Filter Function: Intelligent Disease Recognition & Single-Disease vs Grouped Hospital view
 function applyFilters() {
     const searchInput = document.getElementById("search-input");
     const citySelect = document.getElementById("city-filter");
     const specSelect = document.getElementById("speciality-filter");
     const budgetSelect = document.getElementById("budget-filter");
 
-    const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    const rawSearch = searchInput ? searchInput.value.trim() : "";
     const cityVal = citySelect ? citySelect.value.trim() : "";
     const specDropdownVal = specSelect ? specSelect.value.trim() : "";
     const budgetVal = budgetSelect ? budgetSelect.value.trim() : "";
 
-    const effectiveSpec = selectedSpeciality || specDropdownVal;
+    // 1. Determine whether a particular disease is searched/selected
+    let activeDisease = selectedSpeciality || specDropdownVal;
+    let hospitalQuery = rawSearch;
+
+    if (!activeDisease && rawSearch) {
+        const detected = detectDiseaseFromText(rawSearch);
+        if (detected.speciality) {
+            activeDisease = detected.speciality;
+            hospitalQuery = detected.remainingQuery;
+
+            // Reflect detected disease in dropdown and chips
+            if (specSelect) specSelect.value = activeDisease;
+            document.querySelectorAll("#speciality-chips .chip").forEach(c => {
+                c.classList.toggle("active", (c.getAttribute("data-spec") || "").toLowerCase() === activeDisease.toLowerCase());
+            });
+        }
+    }
+
+    const isSingleDisease = Boolean(activeDisease);
+    window.CURRENT_ACTIVE_DISEASE = isSingleDisease ? activeDisease : "";
+
+    // Update the Active Disease Filter Notification Bar
+    const activeBar = document.getElementById("active-disease-bar");
+    const activeBadge = document.getElementById("active-disease-badge");
+    const activeSubtext = document.getElementById("active-disease-subtext");
+    if (activeBar) {
+        if (isSingleDisease) {
+            activeBar.style.display = "flex";
+            if (activeBadge) activeBadge.textContent = `🎯 Single Disease Mode: ${activeDisease}`;
+            if (activeSubtext) activeSubtext.textContent = `Showing verified success rates for ${activeDisease} only. Other disease cards are hidden.`;
+        } else {
+            activeBar.style.display = "none";
+        }
+    }
 
     let dataset = window.ALL_HOSPITALS && window.ALL_HOSPITALS.length > 0
         ? window.ALL_HOSPITALS
         : INITIAL_HOSPITALS;
 
-    let filtered = dataset.filter(h => {
-        // 1. Text Search (matches name, city, district, speciality)
-        if (searchVal) {
-            const terms = searchVal.split(/\s+/).filter(Boolean);
-            const combined = `${h.name} ${h.city} ${h.district} ${h.speciality}`.toLowerCase();
-            const matchesAllTerms = terms.every(t => combined.includes(t));
-            if (!matchesAllTerms) return false;
+    // 2. CASE A: Single Disease View Mode
+    if (isSingleDisease) {
+        let filtered = dataset.filter(h => {
+            // Must strictly match this single disease
+            if (!isSpecialityMatch(h, activeDisease)) return false;
+
+            // Hospital name / location filter if user entered text
+            if (hospitalQuery) {
+                const terms = hospitalQuery.toLowerCase().split(/\s+/).filter(Boolean);
+                const combined = `${h.name} ${h.city} ${h.district}`.toLowerCase();
+                if (!terms.every(t => combined.includes(t))) return false;
+            }
+
+            // City Filter
+            if (cityVal && !isCityMatch(h, cityVal)) return false;
+
+            // Budget Filter
+            if (budgetVal && budgetVal !== "all" && h.feeTier !== budgetVal) return false;
+
+            // Quick Filter Toggles
+            if (selectedQuickFilter === "nabh" && (h.rating < 4.7 && h.success_rate < 78.0)) return false;
+            if (selectedQuickFilter === "icu" && (h.service_readiness_pct < 37.5 && !h.emergency24x7)) return false;
+            if ((selectedQuickFilter === "cashless" || selectedQuickFilter === "high-volume") && h.no_of_patients_treated < 11000) return false;
+            if (selectedQuickFilter === "high-success" && h.success_rate < 78.0) return false;
+
+            return true;
+        });
+
+        // Sort descending strictly by single disease success rate
+        filtered.sort((a, b) => (Number(b.success_rate) || 0) - (Number(a.success_rate) || 0));
+
+        // Fallback if no exact match for combined city + disease
+        if (filtered.length === 0) {
+            const diseaseFallback = dataset
+                .filter(h => isSpecialityMatch(h, activeDisease))
+                .slice()
+                .sort((a, b) => (Number(b.success_rate) || 0) - (Number(a.success_rate) || 0));
+
+            renderHospitals(diseaseFallback, {
+                isSingleDisease: true,
+                disease: activeDisease,
+                isFallback: true
+            });
+            return;
         }
 
-        // 2. City Filter
+        renderHospitals(filtered, {
+            isSingleDisease: true,
+            disease: activeDisease,
+            isFallback: false
+        });
+        return;
+    }
+
+    // 3. CASE B: General Hospital Search (No disease specified) -> Group by Unique Hospital
+    let matchedRows = dataset.filter(h => {
+        // Hospital name / speciality / location search
+        if (hospitalQuery) {
+            const terms = hospitalQuery.toLowerCase().split(/\s+/).filter(Boolean);
+            const combined = `${h.name} ${h.city} ${h.district} ${h.speciality}`.toLowerCase();
+            if (!terms.every(t => combined.includes(t))) return false;
+        }
+
+        // City Filter
         if (cityVal && !isCityMatch(h, cityVal)) return false;
 
-        // 3. Speciality Filter
-        if (effectiveSpec && !isSpecialityMatch(h, effectiveSpec)) return false;
+        // Budget Filter
+        if (budgetVal && budgetVal !== "all" && h.feeTier !== budgetVal) return false;
 
-        // 4. Budget Filter
-        if (budgetVal && budgetVal !== "all") {
-            if (h.feeTier !== budgetVal) return false;
-        }
-
-        // 5. Quick Filter Toggles
-        if (selectedQuickFilter === "nabh") {
-            if (h.rating < 4.7 && h.success_rate < 78.0) return false;
-        } else if (selectedQuickFilter === "icu") {
-            if (h.service_readiness_pct < 37.5 && !h.emergency24x7) return false;
-        } else if (selectedQuickFilter === "cashless" || selectedQuickFilter === "high-volume") {
-            if (h.no_of_patients_treated < 11000) return false;
-        } else if (selectedQuickFilter === "high-success") {
-            if (h.success_rate < 78.0) return false;
-        }
+        // Quick Filter Toggles
+        if (selectedQuickFilter === "nabh" && (h.rating < 4.7 && h.success_rate < 78.0)) return false;
+        if (selectedQuickFilter === "icu" && (h.service_readiness_pct < 37.5 && !h.emergency24x7)) return false;
+        if ((selectedQuickFilter === "cashless" || selectedQuickFilter === "high-volume") && h.no_of_patients_treated < 11000) return false;
+        if (selectedQuickFilter === "high-success" && h.success_rate < 78.0) return false;
 
         return true;
     });
 
-    // ALWAYS SORT BY HIGHEST SUCCESS RATE
-    filtered.sort((a, b) => (Number(b.success_rate) || 0) - (Number(a.success_rate) || 0));
+    // Group rows by unique hospital name so hospitals don't duplicate 10 times
+    const hospitalMap = new Map();
+    matchedRows.forEach(h => {
+        const key = (h.name || "Hospital").toLowerCase();
+        if (!hospitalMap.has(key)) {
+            hospitalMap.set(key, {
+                id: h.id,
+                name: h.name,
+                city: h.city,
+                district: h.district,
+                rating: h.rating,
+                ranking_score: h.ranking_score,
+                service_readiness_pct: h.service_readiness_pct,
+                overall_rank: h.overall_rank,
+                feeTier: h.feeTier,
+                consultationFee: h.consultationFee,
+                nabh: h.nabh,
+                emergency24x7: h.emergency24x7,
+                cashless: h.cashless,
+                departments: []
+            });
+        }
+        hospitalMap.get(key).departments.push({
+            speciality: h.speciality,
+            success_rate: h.success_rate,
+            no_of_patients_treated: h.no_of_patients_treated,
+            speciality_rank: h.speciality_rank
+        });
+    });
 
-    // Handle fallback so screen NEVER vanishes to 0 hospitals
-    if (filtered.length === 0) {
-        // Fallback: Show top hospitals matching city OR speciality OR overall top
-        const cityFallback = dataset.filter(h => isCityMatch(h, cityVal));
-        const specFallback = dataset.filter(h => isSpecialityMatch(h, effectiveSpec));
-        
-        const fallbackResults = (cityFallback.length > 0 ? cityFallback : (specFallback.length > 0 ? specFallback : dataset))
-            .slice()
-            .sort((a, b) => b.success_rate - a.success_rate);
+    const groupedHospitals = Array.from(hospitalMap.values()).map(h => {
+        h.departments.sort((a, b) => b.success_rate - a.success_rate);
+        const totalPatients = h.departments.reduce((sum, d) => sum + (Number(d.no_of_patients_treated) || 0), 0);
+        const avgSuccess = h.departments.length > 0
+            ? h.departments.reduce((sum, d) => sum + (Number(d.success_rate) || 0), 0) / h.departments.length
+            : 0;
+        const topSuccess = h.departments.length > 0 ? h.departments[0].success_rate : 0;
+        return {
+            ...h,
+            total_patients: totalPatients,
+            avg_success_rate: avgSuccess,
+            success_rate: topSuccess
+        };
+    });
 
-        renderHospitals(fallbackResults, true);
+    // Sort hospitals descending by average success rate
+    groupedHospitals.sort((a, b) => b.avg_success_rate - a.avg_success_rate);
+
+    if (groupedHospitals.length === 0) {
+        // Fallback to top hospitals in Punjab
+        const fallbackResults = dataset.slice(0, 30);
+        renderHospitals(fallbackResults, { isSingleDisease: false, isFallback: true });
         return;
     }
 
-    renderHospitals(filtered, false);
+    renderHospitals(groupedHospitals, { isSingleDisease: false, isFallback: false });
 }
 
-// Render Hospital Cards with Success Rate and Patients Treated
-function renderHospitals(list, isFallback = false) {
+// Render Hospital Cards with Single Disease Rate or Grouped Hospital View
+function renderHospitals(list, options = {}) {
+    const isSingleDisease = Boolean(options.isSingleDisease);
+    const disease = options.disease || "";
+    const isFallback = Boolean(options.isFallback);
+
     const container = document.getElementById("hospitals-container");
     const noResultsMsg = document.getElementById("no-results-msg");
     const countHeading = document.getElementById("results-count-heading");
@@ -467,81 +747,155 @@ function renderHospitals(list, isFallback = false) {
 
     if (noResultsMsg) noResultsMsg.style.display = "none";
 
+    // Dynamic Headings based on Single Disease Mode
     if (countHeading) {
-        if (isFallback) {
+        if (isSingleDisease) {
+            countHeading.textContent = `Top Hospitals for ${disease} (${list.length} available)`;
+        } else if (isFallback) {
             countHeading.textContent = `Top Recommended Hospitals (${list.length} available)`;
         } else {
-            countHeading.textContent = `${list.length} Available Hospitals`;
+            countHeading.textContent = `Available Hospitals (${list.length})`;
         }
     }
 
     if (subtextEl) {
-        if (isFallback) {
-            subtextEl.innerHTML = `<span style="color:#d97706; font-weight:600;">⚠️ No exact match for combined filters. Showing top success-rate hospitals in Punjab:</span>`;
+        if (isSingleDisease) {
+            subtextEl.innerHTML = `🎯 Showing verified success rates for <strong>${disease}</strong> only • Sorted by highest success rate`;
+        } else if (isFallback) {
+            subtextEl.innerHTML = `<span style="color:#d97706; font-weight:600;">⚠️ Showing top success-rate hospitals in Punjab:</span>`;
         } else {
-            subtextEl.textContent = "Ordered by Highest Success Rate • Verified Patients Treated";
+            subtextEl.textContent = "Ordered by Highest Success Rate • Click any disease below to view single disease rate";
         }
     }
 
     // Limit initial DOM render to top 100 for maximum performance
     const toRender = list.slice(0, 100);
 
-    container.innerHTML = toRender.map((h, index) => {
-        const isCompared = comparedHospitals.some(item => item.id === h.id);
-        const compareBtnText = isCompared ? "✓ Added to Compare" : "+ Add to Compare";
-        const compareBtnClass = isCompared ? "btn-add-compare added" : "btn-add-compare";
+    if (isSingleDisease) {
+        // ==========================================
+        // SINGLE DISEASE VIEW: ONLY ONE DISEASE SHOWN
+        // ==========================================
+        container.innerHTML = toRender.map((h, index) => {
+            const isCompared = comparedHospitals.some(item => item.id === h.id);
+            const compareBtnText = isCompared ? "✓ Added to Compare" : "+ Add to Compare";
+            const compareBtnClass = isCompared ? "btn-add-compare added" : "btn-add-compare";
 
-        const locText = h.city && h.district && h.city !== h.district
-            ? `${h.city}, ${h.district}`
-            : (h.city || h.district || "Punjab");
+            const locText = h.city && h.district && h.city !== h.district
+                ? `${h.city}, ${h.district}`
+                : (h.city || h.district || "Punjab");
 
-        const safeName = (h.name || "Hospital").replace(/'/g, "\\'");
+            const safeName = (h.name || "Hospital").replace(/'/g, "\\'");
+            const rankLabel = h.speciality_rank ? `#${h.speciality_rank} in ${disease}` : `#${index + 1} Success Rank`;
 
-        return `
-            <div class="hospital-card" data-id="${h.id}" style="animation-delay: ${(index % 12) * 0.04}s;">
-                <div class="card-header">
-                    <div class="card-top-badges">
+            return `
+                <div class="hospital-card single-disease-card" data-id="${h.id}" style="animation-delay: ${(index % 12) * 0.04}s;">
+                    <div class="card-header">
+                        <div class="card-top-badges">
+                            <div>
+                                <span class="badge-tag badge-nabh">${rankLabel}</span>
+                                <span class="badge-tag badge-emergency" style="margin-left:4px;">🎯 ${h.success_rate}% ${disease} Success</span>
+                            </div>
+                            <div class="rating-badge">★ ${Number(h.rating).toFixed(1)}</div>
+                        </div>
+                        <h3 class="hospital-name">${h.name}</h3>
+                        <div class="hospital-loc">📍 ${locText}</div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="single-disease-badge-callout">
+                            <span class="disease-focus-label">Searched Disease:</span>
+                            <span class="disease-focus-val">🩺 ${disease}</span>
+                        </div>
+
+                        <div class="card-pricing-row single-disease-highlight">
+                            <div class="price-item">
+                                <span class="price-label">🎯 ${disease} Success Rate</span>
+                                <span class="price-val" style="color: #047857; font-size: 17px; font-weight: 800;">${h.success_rate}%</span>
+                            </div>
+                            <div class="price-item" style="text-align: right;">
+                                <span class="price-label">👥 ${disease} Patients Treated</span>
+                                <span class="price-val" style="color: #0f172a; font-size: 15px;">${Number(h.no_of_patients_treated).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn-book" onclick="openBookingModal('${h.id}', '${safeName}', '${h.city}', '${disease}')">
+                            Book Appointment
+                        </button>
+                        <button class="${compareBtnClass}" onclick="toggleCompareHospital('${h.id}')">
+                            ${compareBtnText}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    } else {
+        // ==========================================
+        // GROUPED HOSPITAL VIEW (NO DISEASE FILTER)
+        // ==========================================
+        container.innerHTML = toRender.map((h, index) => {
+            const isCompared = comparedHospitals.some(item => item.id === h.id);
+            const compareBtnText = isCompared ? "✓ Added to Compare" : "+ Add to Compare";
+            const compareBtnClass = isCompared ? "btn-add-compare added" : "btn-add-compare";
+
+            const locText = h.city && h.district && h.city !== h.district
+                ? `${h.city}, ${h.district}`
+                : (h.city || h.district || "Punjab");
+
+            const safeName = (h.name || "Hospital").replace(/'/g, "\\'");
+            const avgRateStr = h.avg_success_rate ? h.avg_success_rate.toFixed(1) : (h.success_rate || 0);
+
+            return `
+                <div class="hospital-card" data-id="${h.id}" style="animation-delay: ${(index % 12) * 0.04}s;">
+                    <div class="card-header">
+                        <div class="card-top-badges">
+                            <div>
+                                <span class="badge-tag badge-nabh">#${index + 1} Hospital Rank</span>
+                                <span class="badge-tag badge-emergency" style="margin-left:4px;">🎯 ${avgRateStr}% Avg Success</span>
+                            </div>
+                            <div class="rating-badge">★ ${Number(h.rating).toFixed(1)}</div>
+                        </div>
+                        <h3 class="hospital-name">${h.name}</h3>
+                        <div class="hospital-loc">📍 ${locText}</div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="card-pricing-row">
+                            <div class="price-item">
+                                <span class="price-label">🎯 Overall Avg Success</span>
+                                <span class="price-val" style="color: #047857; font-size: 15px;">${avgRateStr}%</span>
+                            </div>
+                            <div class="price-item" style="text-align: right;">
+                                <span class="price-label">👥 Total Patients Treated</span>
+                                <span class="price-val" style="color: #0f172a; font-size: 15px;">${Number(h.total_patients || h.no_of_patients_treated || 0).toLocaleString()}</span>
+                            </div>
+                        </div>
+
                         <div>
-                            <span class="badge-tag badge-nabh">#${index + 1} Success Rank</span>
-                            <span class="badge-tag badge-emergency" style="margin-left:4px;">🎯 ${h.success_rate}% Success</span>
-                        </div>
-                        <div class="rating-badge">★ ${Number(h.rating).toFixed(1)}</div>
-                    </div>
-                    <h3 class="hospital-name">${h.name}</h3>
-                    <div class="hospital-loc">📍 ${locText}</div>
-                </div>
-
-                <div class="card-body">
-                    <div>
-                        <div class="price-label" style="margin-bottom: 6px;">Speciality</div>
-                        <div class="specialities-tags">
-                            <span class="spec-pill">${h.speciality}</span>
+                            <div class="price-label" style="margin-bottom: 6px;">Treated Diseases &amp; Rates (Click to filter single disease):</div>
+                            <div class="specialities-tags">
+                                ${(h.departments || []).map(d => `
+                                    <button type="button" class="spec-pill dept-pill-btn" onclick="selectDisease('${d.speciality}')" title="Click to view single disease success rate for ${d.speciality}">
+                                        ${d.speciality} <strong style="color: #059669; margin-left: 3px;">${d.success_rate}%</strong>
+                                    </button>
+                                `).join("")}
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card-pricing-row">
-                        <div class="price-item">
-                            <span class="price-label">🎯 Success Rate</span>
-                            <span class="price-val" style="color: #047857; font-size: 15px;">${h.success_rate}%</span>
-                        </div>
-                        <div class="price-item" style="text-align: right;">
-                            <span class="price-label">👥 Patients Treated</span>
-                            <span class="price-val" style="color: #0f172a; font-size: 15px;">${Number(h.no_of_patients_treated).toLocaleString()}</span>
-                        </div>
+                    <div class="card-footer">
+                        <button class="btn-book" onclick="openBookingModal('${h.id}', '${safeName}', '${h.city}')">
+                            Book Appointment
+                        </button>
+                        <button class="${compareBtnClass}" onclick="toggleCompareHospital('${h.id}')">
+                            ${compareBtnText}
+                        </button>
                     </div>
                 </div>
-
-                <div class="card-footer">
-                    <button class="btn-book" onclick="openBookingModal('${h.id}', '${safeName}', '${h.city}')">
-                        Book Appointment
-                    </button>
-                    <button class="${compareBtnClass}" onclick="toggleCompareHospital('${h.id}')">
-                        ${compareBtnText}
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join("");
+            `;
+        }).join("");
+    }
 }
 
 // Setup real-time event listeners for all filters
@@ -695,6 +1049,10 @@ function resetFilters() {
 
     selectedSpeciality = "";
     selectedQuickFilter = "all";
+    window.CURRENT_ACTIVE_DISEASE = "";
+
+    const activeBar = document.getElementById("active-disease-bar");
+    if (activeBar) activeBar.style.display = "none";
 
     document.querySelectorAll("#speciality-chips .chip").forEach((c, idx) => {
         c.classList.toggle("active", idx === 0);
@@ -774,6 +1132,7 @@ function openCompareModal() {
 
     const modal = document.getElementById("compare-modal");
     const modalContent = document.getElementById("compare-modal-content");
+    const activeDisease = window.CURRENT_ACTIVE_DISEASE || "";
 
     modalContent.innerHTML = `
         <table class="compare-table">
@@ -785,20 +1144,20 @@ function openCompareModal() {
             </thead>
             <tbody>
                 <tr style="background: #f0fdf4;">
-                    <td><strong>🎯 Success Rate</strong></td>
-                    ${comparedHospitals.map(h => `<td style="color:#059669; font-weight:bold; font-size:16px;">${h.success_rate}%</td>`).join("")}
+                    <td><strong>🎯 ${activeDisease ? activeDisease + ' Success Rate' : 'Success Rate'}</strong></td>
+                    ${comparedHospitals.map(h => `<td style="color:#059669; font-weight:bold; font-size:16px;">${h.success_rate || h.avg_success_rate || 0}%</td>`).join("")}
                 </tr>
                 <tr style="background: #eff6ff;">
                     <td><strong>👥 Patients Treated</strong></td>
-                    ${comparedHospitals.map(h => `<td style="color:#2563eb; font-weight:bold; font-size:16px;">${Number(h.no_of_patients_treated).toLocaleString()}</td>`).join("")}
+                    ${comparedHospitals.map(h => `<td style="color:#2563eb; font-weight:bold; font-size:16px;">${Number(h.no_of_patients_treated || h.total_patients || 0).toLocaleString()}</td>`).join("")}
                 </tr>
                 <tr>
                     <td>Patient Rating</td>
                     ${comparedHospitals.map(h => `<td>★ ${Number(h.rating).toFixed(1)}</td>`).join("")}
                 </tr>
                 <tr>
-                    <td>Speciality</td>
-                    ${comparedHospitals.map(h => `<td>${h.speciality}</td>`).join("")}
+                    <td>Speciality / Department</td>
+                    ${comparedHospitals.map(h => `<td>${h.speciality || (h.departments ? h.departments.map(d => d.speciality).join(', ') : 'Multispeciality')}</td>`).join("")}
                 </tr>
                 <tr>
                     <td>24/7 Service Readiness</td>
@@ -806,7 +1165,7 @@ function openCompareModal() {
                 </tr>
                 <tr>
                     <td>Est. Consultation Tier</td>
-                    ${comparedHospitals.map(h => `<td><strong>₹${h.consultationFee}</strong> (${h.feeTier})</td>`).join("")}
+                    ${comparedHospitals.map(h => `<td><strong>₹${h.consultationFee || 650}</strong> (${h.feeTier || 'mid'})</td>`).join("")}
                 </tr>
             </tbody>
         </table>
@@ -820,7 +1179,7 @@ function closeCompareModal() {
 }
 
 // Appointment Modal
-function openBookingModal(id, name, city) {
+function openBookingModal(id, name, city, defaultSpec) {
     const modal = document.getElementById("booking-modal");
     document.getElementById("booking-hospital-name").textContent = `Book at ${name}`;
     document.getElementById("booking-hospital-sub").textContent = `Location: ${city}`;
@@ -832,6 +1191,16 @@ function openBookingModal(id, name, city) {
     const userName = document.getElementById("user-display-name").textContent;
     if (userName && userName !== "Welcome!" && userName !== "Guest User") {
         document.getElementById("book-patient-name").value = userName;
+    }
+
+    const specSelect = document.getElementById("book-patient-spec");
+    if (specSelect && defaultSpec) {
+        for (let i = 0; i < specSelect.options.length; i++) {
+            if (specSelect.options[i].value.toLowerCase() === defaultSpec.toLowerCase()) {
+                specSelect.selectedIndex = i;
+                break;
+            }
+        }
     }
 
     document.getElementById("booking-success-msg").style.display = "none";
@@ -915,3 +1284,6 @@ window.applyFilters = applyFilters;
 window.resetFilters = resetFilters;
 window.filterByCity = filterByCity;
 window.renderHospitals = renderHospitals;
+window.selectDisease = selectDisease;
+window.clearDiseaseFilter = clearDiseaseFilter;
+window.openBookingModal = openBookingModal;

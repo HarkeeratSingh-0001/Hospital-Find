@@ -10,10 +10,111 @@ import urllib.parse
 import csv
 import os
 import json
+import re
 from datetime import datetime
 
 PORT = 8000
 CSV_FILE = os.path.join(os.path.dirname(__file__), "users.csv")
+
+DISEASE_KEYWORDS = {
+    "Cardiology": [
+        "cardiology", "cardio", "heart attack", "heart failure", "coronary",
+        "angioplasty", "bypass surgery", "bypass", "arrhythmia", "hypertension", "high bp",
+        "blood pressure", "chest pain", "valve replacement", "valve", "pacemaker",
+        "atherosclerosis", "stent", "ecg", "heart"
+    ],
+    "Oncology": [
+        "oncology", "chemotherapy", "chemo", "radiation therapy", "radiation",
+        "breast cancer", "lung cancer", "blood cancer", "leukemia", "lymphoma",
+        "prostate cancer", "tumor", "tumour", "biopsy", "carcinoma", "sarcoma",
+        "melanoma", "malignancy", "oncologist", "cancer"
+    ],
+    "Orthopedics": [
+        "orthopedics", "ortho", "knee replacement", "hip replacement", "bone fracture",
+        "fracture", "osteoarthritis", "arthritis", "slipped disc", "back pain",
+        "spine surgery", "spine", "ligament tear", "ligament", "acl", "joint pain",
+        "joint", "joints", "bones", "bone", "knee", "hip", "shoulder", "orthopedic"
+    ],
+    "Neurology": [
+        "neurology", "neuro", "brain tumor", "brain stroke", "stroke", "paralysis",
+        "epilepsy", "seizures", "migraine", "headache", "parkinson", "parkinsons",
+        "nerve pain", "neuropathy", "alzheimer", "memory loss", "brain", "nerve", "nerves"
+    ],
+    "Nephrology": [
+        "nephrology", "kidney failure", "chronic kidney disease", "ckd", "dialysis",
+        "high creatinine", "creatinine", "kidney transplant", "renal failure",
+        "renal", "nephrologist", "kidney"
+    ],
+    "Urology": [
+        "urology", "kidney stones", "kidney stone", "gall stones", "stones", "stone",
+        "urinary tract infection", "uti", "prostate enlargement", "prostate",
+        "bph", "bladder infection", "bladder", "urinary incontinence", "urine infection", "urine"
+    ],
+    "Gastroenterology": [
+        "gastroenterology", "gastro", "liver cirrhosis", "fatty liver", "hepatitis",
+        "jaundice", "acid reflux", "acidity", "gerd", "gastritis", "endoscopy",
+        "stomach ulcer", "ulcer", "ulcers", "digestive disorders", "digestive",
+        "digestion", "stomach pain", "stomach", "liver", "colon", "gut"
+    ],
+    "Pulmonology": [
+        "pulmonology", "respiratory failure", "respiratory", "asthma", "copd",
+        "pneumonia", "tuberculosis", "tb", "bronchitis", "chest infection",
+        "breathing problem", "breathing", "cough", "wheezing", "lungs", "lung"
+    ],
+    "General Surgery": [
+        "general surgery", "appendicitis", "appendix", "hernia repair", "hernia",
+        "gallbladder surgery", "gallbladder", "laparoscopic surgery", "laparoscopy",
+        "piles", "fistula", "trauma surgery", "operation", "surgery", "surgical"
+    ],
+    "Pediatrics": [
+        "pediatrics", "pediatric", "child care", "children care", "child specialist",
+        "newborn care", "newborn", "infant jaundice", "infant", "baby care", "baby",
+        "nicu", "child vaccination", "vaccination", "pediatrician", "children", "child"
+    ],
+    "Gynecology": [
+        "gynecology", "gynae", "gynecologist", "pregnancy care", "pregnancy",
+        "pregnant", "normal delivery", "c-section", "cesarean", "pcos", "pcod",
+        "infertility", "menstrual disorders", "period pain", "period", "uterus",
+        "ovarian", "womens health", "women health"
+    ],
+    "Dermatology": [
+        "dermatology", "skin allergy", "skin disease", "eczema", "psoriasis",
+        "acne", "pimples", "skin rash", "rash", "rashes", "hair fall", "hair loss",
+        "alopecia", "vitiligo", "fungal infection", "dermatitis", "itching", "dermatologist", "skin"
+    ],
+    "Ophthalmology": [
+        "ophthalmology", "cataract surgery", "cataract", "glaucoma", "lasik surgery",
+        "lasik", "retinal detachment", "retina", "cornea", "eye vision",
+        "vision loss", "eye care", "eye surgery", "ophthalmologist", "eyes", "eye"
+    ],
+    "ENT": [
+        "ear nose throat", "ent", "ear infection", "hearing loss", "deafness",
+        "tonsillitis", "tonsils", "sinusitis", "sinus", "throat infection",
+        "throat pain", "deviated septum", "ear pain", "throat", "nose", "ear"
+    ],
+    "General Medicine": [
+        "general medicine", "internal medicine", "viral fever", "typhoid", "dengue",
+        "malaria", "diabetes", "diabetic", "blood sugar", "sugar", "flu", "cold",
+        "infection", "weakness", "physician", "general physician", "fever"
+    ]
+}
+
+SORTED_DISEASE_KEYWORDS = []
+for _spec, _kws in DISEASE_KEYWORDS.items():
+    for _kw in _kws:
+        SORTED_DISEASE_KEYWORDS.append((_kw, _spec, len(_kw)))
+SORTED_DISEASE_KEYWORDS.sort(key=lambda x: x[2], reverse=True)
+
+def detect_disease_server(text):
+    if not text:
+        return None, ""
+    clean = text.lower().strip()
+    for kw, spec, _ in SORTED_DISEASE_KEYWORDS:
+        pattern = r"(^|\b|\s)" + re.escape(kw) + r"(\b|\s|$)"
+        if re.search(pattern, clean):
+            rem = re.sub(pattern, " ", clean).strip()
+            return spec, rem
+    return None, clean
 def get_hospitals_filepath():
     """Use only the hospital database in the server directory to avoid unrelated template data."""
     server_dir = os.path.dirname(__file__)
@@ -210,10 +311,22 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
             # Optional query filters
             parsed_url = urllib.parse.urlparse(self.path)
             query_params = urllib.parse.parse_qs(parsed_url.query)
-            q = query_params.get("q", [""])[0].strip().lower()
+            q = query_params.get("q", [""])[0].strip()
             city = query_params.get("city", [""])[0].strip().lower()
-            speciality = query_params.get("speciality", [""])[0].strip().lower()
+            speciality = query_params.get("speciality", [""])[0].strip()
             quick_filter = query_params.get("filter", [""])[0].strip().lower()
+
+            target_disease = None
+            hospital_query = q.lower()
+
+            if speciality:
+                det, _ = detect_disease_server(speciality)
+                target_disease = det if det else speciality
+            elif q:
+                det, rem = detect_disease_server(q)
+                if det:
+                    target_disease = det
+                    hospital_query = rem.lower()
 
             def match_city(target, c, d, name):
                 if not target or target in ("all", "all cities", "all cities / regions"):
@@ -228,11 +341,17 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 return False
 
             def match_speciality(target, s):
-                if not target or target in ("all", "all specialities"):
+                if not target or target.lower() in ("all", "all specialities", "all diseases / specialities"):
                     return True
-                if target in s or s in target:
+                t = target.lower().strip()
+                s = s.lower().strip()
+                if t == s or t in s or s in t:
                     return True
-                if "emergency" in target or "trauma" in target:
+                # Check keyword list
+                for spec, kws in DISEASE_KEYWORDS.items():
+                    if spec.lower() == s and any(k == t or k in t or t in k for k in kws):
+                        return True
+                if "emergency" in t or "trauma" in t:
                     return s in ("general surgery", "general medicine", "cardiology", "orthopedics")
                 return False
 
@@ -257,13 +376,7 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                     return success >= 78.0
                 return True
 
-            def fallback_to_top_hospitals():
-                fallback_list = hospitals[:30]
-                for item in fallback_list:
-                    item["_fallback_notice"] = True
-                return fallback_list
-
-            if q or city or speciality or quick_filter:
+            if target_disease or hospital_query or city or quick_filter:
                 filtered = []
                 for h in hospitals:
                     name_val = (h.get("hospital_name") or "").lower()
@@ -271,15 +384,16 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                     dist_val = (h.get("district") or "").lower()
                     spec_val = (h.get("speciality") or "").lower()
 
-                    if q:
-                        terms = q.split()
-                        if not all(t in name_val or t in city_val or t in dist_val or t in spec_val for t in terms):
+                    if target_disease and not match_speciality(target_disease, spec_val):
+                        continue
+
+                    if hospital_query:
+                        terms = hospital_query.split()
+                        combined = f"{name_val} {city_val} {dist_val}" if target_disease else f"{name_val} {city_val} {dist_val} {spec_val}"
+                        if not all(t in combined for t in terms):
                             continue
 
                     if city and not match_city(city, city_val, dist_val, name_val):
-                        continue
-
-                    if speciality and not match_speciality(speciality, spec_val):
                         continue
 
                     if not apply_quick_filter(h, quick_filter):
@@ -289,9 +403,11 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
 
                 if filtered:
                     hospitals = filtered
+                elif target_disease:
+                    # Show records for that disease rather than falling back to all diseases
+                    hospitals = [h for h in hospitals if match_speciality(target_disease, (h.get("speciality") or "").lower())]
                 else:
-                    # Graceful fallback: return top success-rate hospitals so the dataset does not vanish
-                    hospitals = fallback_to_top_hospitals()
+                    hospitals = hospitals[:30]
 
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -301,14 +417,11 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
 
         return super().do_GET()
 
-if __name__ == "__main__":
-    init_csv()
-    init_hospitals_csv()
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), HospitalConnectHandler) as httpd:
-        print("=" * 60)
-        print("🏥  HospitalConnect Server with CSV Database is RUNNING!")
-        print(f"👉 Local Web Address:  http://localhost:{PORT}")
-        print(f"👉 Database File:      {CSV_FILE}")
-        print("=" * 60)
-        httpd.serve_forever()
+import os
+
+if __name__ == '__main__':
+    
+    port = int(os.environ.get('PORT', 5000))
+    with socketserver.TCPServer(('0.0.0.0', port), HospitalConnectHandler) as server:
+        print(f"HospitalConnect server running on port {port}")
+        server.serve_forever()
