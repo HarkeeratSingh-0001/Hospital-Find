@@ -249,7 +249,7 @@ async function loadHospitalDataset() {
     const API_URL = 'https://hospital-find.onrender.com/api/hospitals';
     // 1. Try server API
     try {
-        const res = await fetch(`${apiBase}/api/hospitals`, {
+        const res = await fetch(API_URL, {
             method: 'GET',
             headers: { 'Accept': 'application/json' }
         });
