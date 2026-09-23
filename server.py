@@ -117,7 +117,6 @@ def detect_disease_server(text):
     return None, clean
 
 def get_hospitals_filepath():
-    """Use only the hospital database in the server directory to avoid unrelated template data."""
     server_dir = os.path.dirname(__file__)
     candidates = [
         os.path.join(server_dir, "hospitals 2.csv"),
@@ -134,7 +133,6 @@ CSV_HEADERS = ["id", "timestamp", "name", "email", "phone", "city"]
 
 
 def init_csv():
-    """Ensure the CSV database exists with proper headers."""
     if not os.path.exists(CSV_FILE):
         with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
@@ -142,7 +140,6 @@ def init_csv():
         print(f"[DATABASE] Initialized new database at: {CSV_FILE}", flush=True)
 
 def get_next_id():
-    """Determine the next auto-incrementing user ID."""
     if not os.path.exists(CSV_FILE):
         return 1
     with open(CSV_FILE, mode="r", newline="", encoding="utf-8") as f:
@@ -151,7 +148,6 @@ def get_next_id():
         return max(1, len(rows))
 
 def save_user_to_csv(name, email, phone, city):
-    """Appends a new user registration row to users.csv."""
     init_csv()
     user_id = get_next_id()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -165,7 +161,6 @@ def save_user_to_csv(name, email, phone, city):
 
 
 def init_hospitals_csv():
-    """Ensure the hospitals database exists."""
     global HOSPITALS_FILE
     HOSPITALS_FILE = get_hospitals_filepath()
     if not os.path.exists(HOSPITALS_FILE):
@@ -176,7 +171,6 @@ def init_hospitals_csv():
 
 
 def load_hospitals():
-    """Return all hospital records from hospitals 2.csv sorted by success rate descending."""
     file_path = get_hospitals_filepath()
     if not os.path.exists(file_path):
         init_hospitals_csv()
@@ -190,7 +184,6 @@ def load_hospitals():
             if row and any((value or "").strip() for value in row.values()):
                 hospitals.append(row)
 
-    # Sort in order of success rate (descending)
     def parse_success_rate(item):
         try:
             return float(item.get("success_rate", 0) or 0)
@@ -220,7 +213,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
             name, email, phone, city = "", "", "", ""
             content_type = self.headers.get("Content-Type", "")
 
-            # Support both JSON payload and Form Data
             if "application/json" in content_type:
                 try:
                     json_data = json.loads(post_data) if post_data else {}
@@ -237,7 +229,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 phone = parsed_data.get("phone", [""])[0].strip()
                 city = parsed_data.get("city", [""])[0].strip()
 
-            # Live Log in Render Console
             print("\n" + "="*50, flush=True)
             print("🔥 NEW USER REGISTRATION RECEIVED!", flush=True)
             print(f"👤 Name  : {name}", flush=True)
@@ -246,10 +237,8 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
             print(f"📍 City  : {city}", flush=True)
             print("="*50 + "\n", flush=True)
 
-            # Save record into users.csv
             user_id = save_user_to_csv(name, email, phone, city)
 
-            # Return JSON response for API or JSON requests
             if "application/json" in content_type or self.path.startswith("/api/"):
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
@@ -262,7 +251,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode("utf-8"))
                 return
 
-            # Redirect to Home Page for standard HTML form submissions
             encoded_name = urllib.parse.quote(name)
             encoded_city = urllib.parse.quote(city)
             redirect_url = f"/home.html?name={encoded_name}&city={encoded_city}&registered=1"
@@ -316,7 +304,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(404, "Only the configured hospital database page is served.")
             return
 
-        # Direct download endpoint for users.csv
         if self.path == "/download-users-csv":
             init_csv()
             self.send_response(200)
@@ -326,7 +313,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(f.read())
             return
 
-        # View all users as JSON
         if self.path == "/api/users":
             init_csv()
             users = []
@@ -341,11 +327,9 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(users, indent=2).encode("utf-8"))
             return
 
-        # View hospitals as JSON (ordered by success rate descending)
         if self.path == "/api/hospitals" or self.path.startswith("/api/hospitals?") or self.path.startswith("/api/hospitals/"):
             hospitals = load_hospitals()
 
-            # Optional query filters
             parsed_url = urllib.parse.urlparse(self.path)
             query_params = urllib.parse.parse_qs(parsed_url.query)
             q = query_params.get("q", [""])[0].strip()
@@ -370,7 +354,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                     return True
                 if target in c or c in target or target in d or d in target or target in name:
                     return True
-                # Chandigarh / Tricity handling (Mohali / SAS Nagar / Rupnagar)
                 if "chandigarh" in target and ("mohali" in c or "sas nagar" in d or "rupnagar" in c or "mohali" in name):
                     return True
                 if "mohali" in target and ("sas nagar" in d or "chandigarh" in name):
@@ -384,7 +367,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 s = s.lower().strip()
                 if t == s or t in s or s in t:
                     return True
-                # Check keyword list
                 for spec, kws in DISEASE_KEYWORDS.items():
                     if spec.lower() == s and any(k == t or k in t or t in k for k in kws):
                         return True
@@ -441,7 +423,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 if filtered:
                     hospitals = filtered
                 elif target_disease:
-                    # Show records for that disease rather than falling back to all diseases
                     hospitals = [h for h in hospitals if match_speciality(target_disease, (h.get("speciality") or "").lower())]
                 else:
                     hospitals = hospitals[:30]
@@ -458,7 +439,6 @@ if __name__ == "__main__":
     init_csv()
     init_hospitals_csv()
     
-    # Cloud hosting ke environment variable se PORT uthane ke liye:
     port = int(os.environ.get("PORT", 8000))
     
     socketserver.TCPServer.allow_reuse_address = True
