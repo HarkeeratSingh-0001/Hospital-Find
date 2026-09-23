@@ -300,7 +300,7 @@ async function loadHospitalDataset() {
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", () => {
     initUserFromQueryParams();
-    renderHospitals(window.ALL_HOSPITALS);
+    applyFilters(); // Fixed function call: Runs filter & grouping engine on initial load
     setupEventListeners();
     loadHospitalDataset();
 });
@@ -912,13 +912,13 @@ function setupEventListeners() {
         citySelect.addEventListener("change", applyFilters);
     }
 
-    // 3. Speciality Dropdown Change (syncs chip)
+    // 3. Speciality Dropdown Change (syncs chip safely)
     const specSelect = document.getElementById("speciality-filter");
     if (specSelect) {
         specSelect.addEventListener("change", () => {
             selectedSpeciality = specSelect.value;
             document.querySelectorAll("#speciality-chips .chip").forEach(c => {
-                c.classList.toggle("active", c.getAttribute("data-spec").toLowerCase() === selectedSpeciality.toLowerCase());
+                c.classList.toggle("active", (c.getAttribute("data-spec") || "").toLowerCase() === selectedSpeciality.toLowerCase());
             });
             applyFilters();
         });
@@ -1136,7 +1136,7 @@ function openCompareModal() {
             <thead>
                 <tr>
                     <th>Feature</th>
-                    ${comparedHospitals.map(h => `<th><strong>${h.name}</strong><br><small>${h.city}, ${h.district}</small></th>`).join("")}
+                    ${comparedHospitals.map(h => `<th><strong>${h.name}</strong><br><small>${h.city},${h.district}</small></th>`).join("")}
                 </tr>
             </thead>
             <tbody>
@@ -1248,7 +1248,7 @@ function handleSendChatMessage() {
 function appendChatMessage(text, sender) {
     const container = document.getElementById("chat-messages");
     const bubble = document.createElement("div");
-    bubble.className = `chat-bubble ${sender}`;
+    bubble.className = "chat-bubble " + sender;
     bubble.innerHTML = text;
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
@@ -1258,22 +1258,22 @@ function generateAIResponse(query) {
     const lower = query.toLowerCase();
 
     if (lower.includes("cardio") || lower.includes("heart") || lower.includes("chest")) {
-        return `For <strong>Cardiology</strong>, <strong>Lifeline Medical Centre (Tarn Taran / Bathinda)</strong> leads our network with an <strong>80.9% success rate</strong> and over 10,137 treated cardiac patients.`;
+        return "For <strong>Cardiology</strong>, <strong>Lifeline Medical Centre (Tarn Taran / Bathinda)</strong> leads our network with an <strong>80.9% success rate</strong> and over 10,137 treated cardiac patients.";
     }
     if (lower.includes("surgery") || lower.includes("surgeon")) {
-        return `For <strong>General Surgery</strong>, <strong>Apex Medical Centre (Bathinda / Khanna)</strong> has the highest recorded success rate at <strong>81.3%</strong> with 10,000+ successful operations.`;
+        return "For <strong>General Surgery</strong>, <strong>Apex Medical Centre (Bathinda / Khanna)</strong> has the highest recorded success rate at <strong>81.3%</strong> with 10,000+ successful operations.";
     }
     if (lower.includes("gastro") || lower.includes("digest") || lower.includes("stomach")) {
-        return `For <strong>Gastroenterology</strong>, <strong>Lifeline Hospital Rupnagar</strong> ranks highest with an <strong>81.1% success rate</strong> and 17,261 patients treated.`;
+        return "For <strong>Gastroenterology</strong>, <strong>Lifeline Hospital Rupnagar</strong> ranks highest with an <strong>81.1% success rate</strong> and 17,261 patients treated.";
     }
     if (lower.includes("emergency") || lower.includes("ambulance")) {
-        return `🚨 For immediate life-saving care, dial <strong>108</strong>. Facilities with high emergency readiness (≥43.75%) include <strong>Healing Touch Multispeciality</strong> and <strong>Apex Medical Centre</strong>.`;
+        return "&#x1F6A8; For immediate life-saving care, dial <strong>108</strong>. Facilities with high emergency readiness (&gt;=43.75%) include <strong>Healing Touch Multispeciality</strong> and <strong>Apex Medical Centre</strong>.";
     }
     if (lower.includes("rate") || lower.includes("success") || lower.includes("best")) {
-        return `Top hospitals by verified success rate in Punjab:<br>1. <strong>Healing Touch Multispeciality (81.6%)</strong> - 15,343 patients<br>2. <strong>Apex Medical Centre (81.3%)</strong> - 10,000 patients<br>3. <strong>Lifeline Hospital (81.1%)</strong> - 17,261 patients.`;
+        return "Top hospitals by verified success rate in Punjab:<br>1. <strong>Healing Touch Multispeciality (81.6%)</strong> - 15,343 patients<br>2. <strong>Apex Medical Centre (81.3%)</strong> - 10,000 patients<br>3. <strong>Lifeline Hospital (81.1%)</strong> - 17,261 patients.";
     }
 
-    return `Based on our verified database of 5,000 hospital records across Punjab, hospitals are sorted in order of <strong>highest success rate</strong>. You can filter by City, Speciality, or quick badges above.`;
+    return "Based on our verified database of 5,000 hospital records across Punjab, hospitals are sorted in order of <strong>highest success rate</strong>. You can filter by City, Speciality, or quick badges above.";
 }
 
 // Global exports for inline HTML calls
