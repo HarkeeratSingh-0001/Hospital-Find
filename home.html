@@ -691,12 +691,34 @@
                 }
             }
 
-            // NOTE: applyFilters, resetFilters, filterByCity are defined and exported
-            // by home.js (window.applyFilters = applyFilters at end of file).
-            // Do NOT override them here — home.js handles all client-side filtering
-            // using window.ALL_HOSPITALS for accurate, no-blank-screen results.
-
             document.addEventListener('DOMContentLoaded', () => {
+                // Populate Registered User Info from URL or localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                let userName = urlParams.get('name');
+                let userCity = urlParams.get('city');
+
+                if (userName) {
+                    localStorage.setItem('user_name', userName);
+                    localStorage.setItem('user_city', userCity);
+                } else {
+                    userName = localStorage.getItem('user_name');
+                    userCity = localStorage.getItem('user_city');
+                }
+
+                if (userName && userName !== "null" && userName !== "undefined") {
+                    const nameElement = document.getElementById('user-display-name');
+                    const cityElement = document.getElementById('user-display-city');
+                    const avatarElement = document.getElementById('user-avatar');
+
+                    if (nameElement) nameElement.innerText = userName;
+                    if (cityElement) cityElement.innerText = '📍 ' + (userCity || 'Mohali');
+
+                    if (avatarElement) {
+                        const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+                        avatarElement.innerText = initials;
+                    }
+                }
+
                 // Booking form: send to server endpoint
                 const bookingForm = document.getElementById('booking-form');
                 if (bookingForm) {
@@ -719,10 +741,6 @@
                 // Expose server-side helpers globally (used by quick prompts)
                 window.fetchHospitalsFromServer = fetchHospitalsFromServer;
                 window.sendAssistantMessageToServer = sendAssistantMessageToServer;
-
-                // NOTE: Initial hospital load is handled by home.js → loadHospitalDataset()
-                // which fetches from the server API or falls back to the CSV file.
-                // home.js's DOMContentLoaded listener runs first (script tag before this inline block).
             });
         })();
     </script>
