@@ -37,7 +37,7 @@ body {
         box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
     }
     50% {
-        box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
+        box-shadow: 0 0 0 6px rgba(95, 85, 248, 0);
     }
 }
 
@@ -48,7 +48,7 @@ body {
     }
     50% {
         transform: translateY(-4px);
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.28);
+        box-shadow: 0 12px 28px rgba(88, 128, 220, 0.28);
     }
 }
 
@@ -129,7 +129,7 @@ body {
     font-size: 12.5px;
     position: relative;
     z-index: 101;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(82, 130, 233, 0.1);
 }
 
 .emergency-content {
@@ -190,7 +190,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 90;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 1px 3px rgba(131, 87, 242, 0.02);
     transition: all 0.25s ease;
 }
 
@@ -219,7 +219,7 @@ body {
 
 .logo:hover {
     transform: scale(1.04);
-    color: #1e293b;
+    color: #789cd8;
 }
 
 .logo-icon {
@@ -268,16 +268,16 @@ body {
 .nav-links a:hover,
 .nav-links .nav-btn:hover {
     transform: scale(1.06) translateY(-1px);
-    color: #0f172a;
+    color: #688fec;
     background: #f1f5f9;
     border-color: #e2e8f0;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 2px 8px rgba(104, 147, 246, 0.04);
 }
 
 /* ACTIVE STATE: Calm Deep Navy */
 .nav-links a.active,
 .nav-links .nav-btn.active {
-    background: #0f172a;
+    background: #7299f3;
     color: #ffffff !important;
     border-color: #0f172a;
     box-shadow: 0 3px 12px rgba(15, 23, 42, 0.18);
@@ -298,7 +298,7 @@ body {
 }
 
 .badge-ai {
-    background: #0f172a;
+    background: #304a86;
     color: #ffffff;
     font-size: 10px;
     padding: 2px 7px;
@@ -328,7 +328,7 @@ body {
 /* Compare Counter Tab Button with Hover Zoom */
 .compare-nav-btn {
     background: #ffffff;
-    color: #0f172a;
+    color: #5c86e9;
     border: 1px solid #e2e8f0;
     padding: 7px 16px;
     border-radius: 20px;
@@ -443,13 +443,13 @@ body {
    Hero & Advanced Search Section (Architectural Nordic)
 ------------------------------------ */
 .hero-section {
-    background: #0f172a;
+    background: #5682f1;
     background-image: radial-gradient(at 100% 0%, rgba(30, 58, 138, 0.22) 0px, transparent 55%),
                       radial-gradient(at 0% 100%, rgba(15, 23, 42, 0.95) 0px, transparent 55%);
     border-radius: 20px;
     color: #ffffff;
     padding: 44px 38px;
-    box-shadow: 0 12px 35px -8px rgba(15, 23, 42, 0.15);
+    box-shadow: 0 12px 35px -8px rgba(17, 20, 27, 0.15);
     margin-bottom: 35px;
     position: relative;
     overflow: hidden;
@@ -513,7 +513,7 @@ body {
     background: #ffffff;
     border-radius: 14px;
     padding: 20px 22px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 30px rgba(91, 114, 243, 0.15);
     color: #0f172a;
     border: 1px solid #e2e8f0;
 }
@@ -562,7 +562,7 @@ body {
     border-radius: 8px;
     font-size: 13.5px;
     background: #f8fafc;
-    color: #0f172a;
+    color: #6489e1;
     outline: none;
     transition: all 0.2s ease;
 }
@@ -571,7 +571,7 @@ body {
 .input-with-icon select:focus {
     border-color: #0f172a;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 0 0 3px rgba(107, 143, 227, 0.08);
 }
 
 .search-submit-row {
@@ -583,7 +583,7 @@ body {
 
 /* Primary Search Button with Hover Zoom */
 .btn-primary-search {
-    background: #0f172a;
+    background: #638cec;
     color: #ffffff;
     border: 1px solid #0f172a;
     padding: 11px 28px;
@@ -600,7 +600,7 @@ body {
 .btn-primary-search:hover {
     transform: scale(1.04) translateY(-1px);
     background: #1e293b;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 6px 16px rgba(68, 103, 186, 0.2);
 }
 
 .btn-primary-search:active {
@@ -648,7 +648,7 @@ body {
 
 .section-header h2 {
     font-size: 20px;
-    color: #0f172a;
+    color: #4f6fb9;
     font-weight: 800;
     letter-spacing: -0.3px;
 }
