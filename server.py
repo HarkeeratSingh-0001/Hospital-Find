@@ -10,12 +10,113 @@ import urllib.parse
 import csv
 import os
 import json
+import re
 from datetime import datetime
 
 PORT = 8000
 CSV_FILE = os.path.join(os.path.dirname(__file__), "users.csv")
+
+DISEASE_KEYWORDS = {
+    "Cardiology": [
+        "cardiology", "cardio", "heart attack", "heart failure", "coronary",
+        "angioplasty", "bypass surgery", "bypass", "arrhythmia", "hypertension", "high bp",
+        "blood pressure", "chest pain", "valve replacement", "valve", "pacemaker",
+        "atherosclerosis", "stent", "ecg", "heart"
+    ],
+    "Oncology": [
+        "oncology", "chemotherapy", "chemo", "radiation therapy", "radiation",
+        "breast cancer", "lung cancer", "blood cancer", "leukemia", "lymphoma",
+        "prostate cancer", "tumor", "tumour", "biopsy", "carcinoma", "sarcoma",
+        "melanoma", "malignancy", "oncologist", "cancer"
+    ],
+    "Orthopedics": [
+        "orthopedics", "ortho", "knee replacement", "hip replacement", "bone fracture",
+        "fracture", "osteoarthritis", "arthritis", "slipped disc", "back pain",
+        "spine surgery", "spine", "ligament tear", "ligament", "acl", "joint pain",
+        "joint", "joints", "bones", "bone", "knee", "hip", "shoulder", "orthopedic"
+    ],
+    "Neurology": [
+        "neurology", "neuro", "brain tumor", "brain stroke", "stroke", "paralysis",
+        "epilepsy", "seizures", "migraine", "headache", "parkinson", "parkinsons",
+        "nerve pain", "neuropathy", "alzheimer", "memory loss", "brain", "nerve", "nerves"
+    ],
+    "Nephrology": [
+        "nephrology", "kidney failure", "chronic kidney disease", "ckd", "dialysis",
+        "high creatinine", "creatinine", "kidney transplant", "renal failure",
+        "renal", "nephrologist", "kidney"
+    ],
+    "Urology": [
+        "urology", "kidney stones", "kidney stone", "gall stones", "stones", "stone",
+        "urinary tract infection", "uti", "prostate enlargement", "prostate",
+        "bph", "bladder infection", "bladder", "urinary incontinence", "urine infection", "urine"
+    ],
+    "Gastroenterology": [
+        "gastroenterology", "gastro", "liver cirrhosis", "fatty liver", "hepatitis",
+        "jaundice", "acid reflux", "acidity", "gerd", "gastritis", "endoscopy",
+        "stomach ulcer", "ulcer", "ulcers", "digestive disorders", "digestive",
+        "digestion", "stomach pain", "stomach", "liver", "colon", "gut"
+    ],
+    "Pulmonology": [
+        "pulmonology", "respiratory failure", "respiratory", "asthma", "copd",
+        "pneumonia", "tuberculosis", "tb", "bronchitis", "chest infection",
+        "breathing problem", "breathing", "cough", "wheezing", "lungs", "lung"
+    ],
+    "General Surgery": [
+        "general surgery", "appendicitis", "appendix", "hernia repair", "hernia",
+        "gallbladder surgery", "gallbladder", "laparoscopic surgery", "laparoscopy",
+        "piles", "fistula", "trauma surgery", "operation", "surgery", "surgical"
+    ],
+    "Pediatrics": [
+        "pediatrics", "pediatric", "child care", "children care", "child specialist",
+        "newborn care", "newborn", "infant jaundice", "infant", "baby care", "baby",
+        "nicu", "child vaccination", "vaccination", "pediatrician", "children", "child"
+    ],
+    "Gynecology": [
+        "gynecology", "gynae", "gynecologist", "pregnancy care", "pregnancy",
+        "pregnant", "normal delivery", "c-section", "cesarean", "pcos", "pcod",
+        "infertility", "menstrual disorders", "period pain", "period", "uterus",
+        "ovarian", "womens health", "women health"
+    ],
+    "Dermatology": [
+        "dermatology", "skin allergy", "skin disease", "eczema", "psoriasis",
+        "acne", "pimples", "skin rash", "rash", "rashes", "hair fall", "hair loss",
+        "alopecia", "vitiligo", "fungal infection", "dermatitis", "itching", "dermatologist", "skin"
+    ],
+    "Ophthalmology": [
+        "ophthalmology", "cataract surgery", "cataract", "glaucoma", "lasik surgery",
+        "lasik", "retinal detachment", "retina", "cornea", "eye vision",
+        "vision loss", "eye care", "eye surgery", "ophthalmologist", "eyes", "eye"
+    ],
+    "ENT": [
+        "ear nose throat", "ent", "ear infection", "hearing loss", "deafness",
+        "tonsillitis", "tonsils", "sinusitis", "sinus", "throat infection",
+        "throat pain", "deviated septum", "ear pain", "throat", "nose", "ear"
+    ],
+    "General Medicine": [
+        "general medicine", "internal medicine", "viral fever", "typhoid", "dengue",
+        "malaria", "diabetes", "diabetic", "blood sugar", "sugar", "flu", "cold",
+        "infection", "weakness", "physician", "general physician", "fever"
+    ]
+}
+
+SORTED_DISEASE_KEYWORDS = []
+for _spec, _kws in DISEASE_KEYWORDS.items():
+    for _kw in _kws:
+        SORTED_DISEASE_KEYWORDS.append((_kw, _spec, len(_kw)))
+SORTED_DISEASE_KEYWORDS.sort(key=lambda x: x[2], reverse=True)
+
+def detect_disease_server(text):
+    if not text:
+        return None, ""
+    clean = text.lower().strip()
+    for kw, spec, _ in SORTED_DISEASE_KEYWORDS:
+        pattern = r"(^|\b|\s)" + re.escape(kw) + r"(\b|\s|$)"
+        if re.search(pattern, clean):
+            rem = re.sub(pattern, " ", clean).strip()
+            return spec, rem
+    return None, clean
+
 def get_hospitals_filepath():
-    """Use only the hospital database in the server directory to avoid unrelated template data."""
     server_dir = os.path.dirname(__file__)
     candidates = [
         os.path.join(server_dir, "hospitals 2.csv"),
@@ -32,15 +133,13 @@ CSV_HEADERS = ["id", "timestamp", "name", "email", "phone", "city"]
 
 
 def init_csv():
-    """Ensure the CSV database exists with proper headers."""
     if not os.path.exists(CSV_FILE):
         with open(CSV_FILE, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(CSV_HEADERS)
-        print(f"[DATABASE] Initialized new database at: {CSV_FILE}")
+        print(f"[DATABASE] Initialized new database at: {CSV_FILE}", flush=True)
 
 def get_next_id():
-    """Determine the next auto-incrementing user ID."""
     if not os.path.exists(CSV_FILE):
         return 1
     with open(CSV_FILE, mode="r", newline="", encoding="utf-8") as f:
@@ -49,7 +148,6 @@ def get_next_id():
         return max(1, len(rows))
 
 def save_user_to_csv(name, email, phone, city):
-    """Appends a new user registration row to users.csv."""
     init_csv()
     user_id = get_next_id()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -58,23 +156,21 @@ def save_user_to_csv(name, email, phone, city):
         writer = csv.writer(f)
         writer.writerow([user_id, timestamp, name, email, phone, city])
     
-    print(f"[DATABASE] Saved User #{user_id}: {name} ({email}, {city}) into users.csv")
+    print(f"[DATABASE] Saved User #{user_id}: {name} ({email}, {phone}, {city}) into users.csv", flush=True)
     return user_id
 
 
 def init_hospitals_csv():
-    """Ensure the hospitals database exists."""
     global HOSPITALS_FILE
     HOSPITALS_FILE = get_hospitals_filepath()
     if not os.path.exists(HOSPITALS_FILE):
         with open(HOSPITALS_FILE, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(["hospital_name", "district", "city", "speciality", "hospital_rating", "success_rate", "service_readiness_pct", "ranking_score", "speciality_rank", "overall_rank", "no_of_patients_treated"])
-        print(f"[DATABASE] Initialized new hospitals database at: {HOSPITALS_FILE}")
+        print(f"[DATABASE] Initialized new hospitals database at: {HOSPITALS_FILE}", flush=True)
 
 
 def load_hospitals():
-    """Return all hospital records from hospitals 2.csv sorted by success rate descending."""
     file_path = get_hospitals_filepath()
     if not os.path.exists(file_path):
         init_hospitals_csv()
@@ -88,7 +184,6 @@ def load_hospitals():
             if row and any((value or "").strip() for value in row.values()):
                 hospitals.append(row)
 
-    # Sort in order of success rate (descending)
     def parse_success_rate(item):
         try:
             return float(item.get("success_rate", 0) or 0)
@@ -114,17 +209,48 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
         content_length = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else ""
 
-        if self.path == "/register" or self.path.startswith("/register?"):
-            parsed_data = urllib.parse.parse_qs(post_data)
-            name = parsed_data.get("name", [""])[0].strip()
-            email = parsed_data.get("email", [""])[0].strip()
-            phone = parsed_data.get("phone", [""])[0].strip()
-            city = parsed_data.get("city", [""])[0].strip()
+        if self.path in ("/register", "/api/register") or self.path.startswith("/register?") or self.path.startswith("/api/register?"):
+            name, email, phone, city = "", "", "", ""
+            content_type = self.headers.get("Content-Type", "")
 
-            # 1. Save record into users.csv
-            save_user_to_csv(name, email, phone, city)
+            if "application/json" in content_type:
+                try:
+                    json_data = json.loads(post_data) if post_data else {}
+                    name = str(json_data.get("name", "")).strip()
+                    email = str(json_data.get("email", "")).strip()
+                    phone = str(json_data.get("phone", "")).strip()
+                    city = str(json_data.get("city", "")).strip()
+                except Exception as err:
+                    print(f"⚠️ JSON Parsing Error: {err}", flush=True)
+            else:
+                parsed_data = urllib.parse.parse_qs(post_data)
+                name = parsed_data.get("name", [""])[0].strip()
+                email = parsed_data.get("email", [""])[0].strip()
+                phone = parsed_data.get("phone", [""])[0].strip()
+                city = parsed_data.get("city", [""])[0].strip()
 
-            # 2. Redirect to Home Page with user's name & city
+            print("\n" + "="*50, flush=True)
+            print("🔥 NEW USER REGISTRATION RECEIVED!", flush=True)
+            print(f"👤 Name  : {name}", flush=True)
+            print(f"📧 Email : {email}", flush=True)
+            print(f"📞 Phone : {phone}", flush=True)
+            print(f"📍 City  : {city}", flush=True)
+            print("="*50 + "\n", flush=True)
+
+            user_id = save_user_to_csv(name, email, phone, city)
+
+            if "application/json" in content_type or self.path.startswith("/api/"):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                response = {
+                    "success": True,
+                    "message": "User registered successfully!",
+                    "user": {"id": user_id, "name": name, "email": email, "phone": phone, "city": city}
+                }
+                self.wfile.write(json.dumps(response).encode("utf-8"))
+                return
+
             encoded_name = urllib.parse.quote(name)
             encoded_city = urllib.parse.quote(city)
             redirect_url = f"/home.html?name={encoded_name}&city={encoded_city}&registered=1"
@@ -178,7 +304,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(404, "Only the configured hospital database page is served.")
             return
 
-        # Direct download endpoint for users.csv
         if self.path == "/download-users-csv":
             init_csv()
             self.send_response(200)
@@ -188,7 +313,6 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(f.read())
             return
 
-        # View all users as JSON
         if self.path == "/api/users":
             init_csv()
             users = []
@@ -203,24 +327,33 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(users, indent=2).encode("utf-8"))
             return
 
-        # View hospitals as JSON (ordered by success rate descending)
         if self.path == "/api/hospitals" or self.path.startswith("/api/hospitals?") or self.path.startswith("/api/hospitals/"):
             hospitals = load_hospitals()
 
-            # Optional query filters
             parsed_url = urllib.parse.urlparse(self.path)
             query_params = urllib.parse.parse_qs(parsed_url.query)
-            q = query_params.get("q", [""])[0].strip().lower()
+            q = query_params.get("q", [""])[0].strip()
             city = query_params.get("city", [""])[0].strip().lower()
-            speciality = query_params.get("speciality", [""])[0].strip().lower()
+            speciality = query_params.get("speciality", [""])[0].strip()
             quick_filter = query_params.get("filter", [""])[0].strip().lower()
+
+            target_disease = None
+            hospital_query = q.lower()
+
+            if speciality:
+                det, _ = detect_disease_server(speciality)
+                target_disease = det if det else speciality
+            elif q:
+                det, rem = detect_disease_server(q)
+                if det:
+                    target_disease = det
+                    hospital_query = rem.lower()
 
             def match_city(target, c, d, name):
                 if not target or target in ("all", "all cities", "all cities / regions"):
                     return True
                 if target in c or c in target or target in d or d in target or target in name:
                     return True
-                # Chandigarh / Tricity handling (Mohali / SAS Nagar / Rupnagar)
                 if "chandigarh" in target and ("mohali" in c or "sas nagar" in d or "rupnagar" in c or "mohali" in name):
                     return True
                 if "mohali" in target and ("sas nagar" in d or "chandigarh" in name):
@@ -228,11 +361,16 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                 return False
 
             def match_speciality(target, s):
-                if not target or target in ("all", "all specialities"):
+                if not target or target.lower() in ("all", "all specialities", "all diseases / specialities"):
                     return True
-                if target in s or s in target:
+                t = target.lower().strip()
+                s = s.lower().strip()
+                if t == s or t in s or s in t:
                     return True
-                if "emergency" in target or "trauma" in target:
+                for spec, kws in DISEASE_KEYWORDS.items():
+                    if spec.lower() == s and any(k == t or k in t or t in k for k in kws):
+                        return True
+                if "emergency" in t or "trauma" in t:
                     return s in ("general surgery", "general medicine", "cardiology", "orthopedics")
                 return False
 
@@ -257,13 +395,7 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                     return success >= 78.0
                 return True
 
-            def fallback_to_top_hospitals():
-                fallback_list = hospitals[:30]
-                for item in fallback_list:
-                    item["_fallback_notice"] = True
-                return fallback_list
-
-            if q or city or speciality or quick_filter:
+            if target_disease or hospital_query or city or quick_filter:
                 filtered = []
                 for h in hospitals:
                     name_val = (h.get("hospital_name") or "").lower()
@@ -271,15 +403,16 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
                     dist_val = (h.get("district") or "").lower()
                     spec_val = (h.get("speciality") or "").lower()
 
-                    if q:
-                        terms = q.split()
-                        if not all(t in name_val or t in city_val or t in dist_val or t in spec_val for t in terms):
+                    if target_disease and not match_speciality(target_disease, spec_val):
+                        continue
+
+                    if hospital_query:
+                        terms = hospital_query.split()
+                        combined = f"{name_val} {city_val} {dist_val}" if target_disease else f"{name_val} {city_val} {dist_val} {spec_val}"
+                        if not all(t in combined for t in terms):
                             continue
 
                     if city and not match_city(city, city_val, dist_val, name_val):
-                        continue
-
-                    if speciality and not match_speciality(speciality, spec_val):
                         continue
 
                     if not apply_quick_filter(h, quick_filter):
@@ -289,9 +422,10 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
 
                 if filtered:
                     hospitals = filtered
+                elif target_disease:
+                    hospitals = [h for h in hospitals if match_speciality(target_disease, (h.get("speciality") or "").lower())]
                 else:
-                    # Graceful fallback: return top success-rate hospitals so the dataset does not vanish
-                    hospitals = fallback_to_top_hospitals()
+                    hospitals = hospitals[:30]
 
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -304,11 +438,14 @@ class HospitalConnectHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     init_csv()
     init_hospitals_csv()
+    
+    port = int(os.environ.get("PORT", 8000))
+    
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), HospitalConnectHandler) as httpd:
-        print("=" * 60)
-        print("🏥  HospitalConnect Server with CSV Database is RUNNING!")
-        print(f"👉 Local Web Address:  http://localhost:{PORT}")
-        print(f"👉 Database File:      {CSV_FILE}")
-        print("=" * 60)
+    with socketserver.TCPServer(("", port), HospitalConnectHandler) as httpd:
+        print("=" * 60, flush=True)
+        print("🏥 HospitalConnect Server with CSV Database is RUNNING!", flush=True)
+        print(f"👉 Local Web Address: http://localhost:{port}", flush=True)
+        print(f"👉 Database File: {CSV_FILE}", flush=True)
+        print("=" * 60, flush=True)
         httpd.serve_forever()

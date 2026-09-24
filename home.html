@@ -67,13 +67,13 @@
                             
                             <!-- Search by Name or Treatment -->
                             <div class="input-field">
-                                <label for="search-input">Search Hospital By Name</label>
+                                <label for="search-input">Search Hospital or Disease / Treatment</label>
                                 <div class="input-with-icon">
                                     <span class="field-icon">🔍</span>
                                     <input 
                                         type="text" 
                                         id="search-input" 
-                                        placeholder="e.g. PGIMER, etc"
+                                        placeholder="e.g. Heart, Cancer, Kidney, Knee, Apex Hospital..."
                                     >
                                 </div>
                             </div>
@@ -117,28 +117,29 @@
                                 </div>
                             </div>
 
-                            <!-- Speciality Dropdown -->
+                            <!-- Speciality Dropdown with Disease Descriptions -->
                             <div class="input-field">
-                                <label for="speciality-filter">Speciality</label>
+                                <label for="speciality-filter">Disease / Speciality</label>
                                 <div class="input-with-icon">
                                     <span class="field-icon">🩺</span>
                                     <select id="speciality-filter">
-                                        <option value="">All Specialities</option>
-                                        <option value="Cardiology">Cardiology (Heart)</option>
-                                        <option value="General Surgery">General Surgery (Surgical)</option>
-                                        <option value="Orthopedics">Orthopedics (Bones &amp; Joints)</option>
-                                        <option value="Neurology">Neurology (Brain &amp; Nerves)</option>
-                                        <option value="Oncology">Oncology (Cancer Care)</option>
-                                        <option value="Pediatrics">Pediatrics (Child Care)</option>
-                                        <option value="Nephrology">Nephrology (Kidney)</option>
-                                        <option value="Gastroenterology">Gastroenterology (Digestive)</option>
-                                        <option value="ENT">ENT (Ear, Nose &amp; Throat)</option>
-                                        <option value="Dermatology">Dermatology (Skin)</option>
-                                        <option value="General Medicine">General Medicine (Physician)</option>
-                                        <option value="Gynecology">Gynecology (Women's Health)</option>
-                                        <option value="Ophthalmology">Ophthalmology (Eye Care)</option>
-                                        <option value="Pulmonology">Pulmonology (Lungs &amp; Chest)</option>
-                                        <option value="Emergency">24x7 Emergency / Trauma</option>
+                                        <option value="">All Diseases / Specialities</option>
+                                        <option value="Cardiology">Cardiology (Heart Diseases, Attack, Angioplasty)</option>
+                                        <option value="Oncology">Oncology (Cancer, Chemotherapy, Tumors)</option>
+                                        <option value="Orthopedics">Orthopedics (Bones, Joints, Knee, Fractures)</option>
+                                        <option value="Neurology">Neurology (Brain, Stroke, Paralysis, Nerves)</option>
+                                        <option value="Nephrology">Nephrology (Kidney, Dialysis, Renal Failure)</option>
+                                        <option value="Urology">Urology (Kidney Stones, Prostate, Bladder)</option>
+                                        <option value="Gastroenterology">Gastroenterology (Stomach, Liver, Digestion)</option>
+                                        <option value="Pulmonology">Pulmonology (Lungs, Asthma, Chest, TB)</option>
+                                        <option value="General Surgery">General Surgery (Appendix, Hernia, Operations)</option>
+                                        <option value="Pediatrics">Pediatrics (Child Care, Infants &amp; Baby)</option>
+                                        <option value="Gynecology">Gynecology (Pregnancy, Women's Health, PCOS)</option>
+                                        <option value="Dermatology">Dermatology (Skin Diseases, Allergies, Hair)</option>
+                                        <option value="Ophthalmology">Ophthalmology (Eye Care, Cataract, Vision)</option>
+                                        <option value="ENT">ENT (Ear, Nose &amp; Throat Disorders)</option>
+                                        <option value="General Medicine">General Medicine (Fever, Diabetes, Infections)</option>
+                                        <option value="Emergency">24x7 Emergency &amp; Trauma Care</option>
                                     </select>
                                 </div>
                             </div>
@@ -161,10 +162,10 @@
 
                         <div class="search-submit-row">
                             <button type="submit" class="btn-primary-search">
-                                <span>Search Hospitals</span>
+                                <span>Search Hospitals &amp; Diseases</span>
                             </button>
                             <button type="button" class="btn-reset-search" onclick="resetFilters()">
-                                Reset
+                                Reset All
                             </button>
                         </div>
                     </form>
@@ -175,21 +176,27 @@
         <!-- Quick Speciality Carousel / Filter Chips -->
         <section class="speciality-chips-section" id="specialities">
             <div class="section-header">
-                <h2>Browse by Medical Speciality</h2>
-                <p>Select a category to filter hospitals instantly by highest success rate</p>
+                <h2>Browse by Disease / Medical Speciality</h2>
+                <p>Click any disease to view single disease success rates and specialist hospital rankings</p>
             </div>
             
             <div class="chips-container" id="speciality-chips">
                 <button class="chip active" data-spec="">All</button>
-                <button class="chip" data-spec="Cardiology">🫀 Cardiology</button>
+                <button class="chip" data-spec="Cardiology">🫀 Cardiology (Heart)</button>
+                <button class="chip" data-spec="Oncology">🔬 Oncology (Cancer)</button>
+                <button class="chip" data-spec="Orthopedics">🦴 Orthopedics (Knee &amp; Bone)</button>
+                <button class="chip" data-spec="Neurology">🧠 Neurology (Brain)</button>
+                <button class="chip" data-spec="Nephrology">🩸 Nephrology (Kidney)</button>
+                <button class="chip" data-spec="Urology">🩺 Urology (Kidney Stones)</button>
+                <button class="chip" data-spec="Gastroenterology">🍽️ Gastroenterology (Liver/Stomach)</button>
+                <button class="chip" data-spec="Pulmonology">🫁 Pulmonology (Lungs/Asthma)</button>
                 <button class="chip" data-spec="General Surgery">🩺 General Surgery</button>
-                <button class="chip" data-spec="Neurology">🧠 Neurology</button>
-                <button class="chip" data-spec="Orthopedics">🦴 Orthopedics</button>
-                <button class="chip" data-spec="Oncology">🔬 Oncology</button>
-                <button class="chip" data-spec="Pediatrics">👶 Pediatrics</button>
-                <button class="chip" data-spec="Nephrology">🩸 Nephrology</button>
-                <button class="chip" data-spec="Gastroenterology">🍽️ Gastroenterology</button>
-                <button class="chip" data-spec="ENT">👂 ENT</button>
+                <button class="chip" data-spec="Pediatrics">👶 Pediatrics (Child Care)</button>
+                <button class="chip" data-spec="Gynecology">🌸 Gynecology (Women Health)</button>
+                <button class="chip" data-spec="Dermatology">🧴 Dermatology (Skin)</button>
+                <button class="chip" data-spec="Ophthalmology">👁️ Ophthalmology (Eye Care)</button>
+                <button class="chip" data-spec="ENT">👂 ENT (Ear/Nose/Throat)</button>
+                <button class="chip" data-spec="General Medicine">💊 General Medicine (Fever/Diabetes)</button>
             </div>
         </section>
 
@@ -226,6 +233,15 @@
                     <button class="filter-toggle" data-filter="icu">⚡ 24/7 ICU &amp; Emergency</button>
                     <button class="filter-toggle" data-filter="cashless">👥 High Patient Volume</button>
                 </div>
+            </div>
+
+            <!-- Active Single Disease Filter Notification Bar -->
+            <div class="active-disease-bar" id="active-disease-bar" style="display: none;">
+                <div class="active-disease-info">
+                    <span class="active-disease-badge" id="active-disease-badge">🎯 Single Disease Mode: Cardiology</span>
+                    <span class="active-disease-subtext" id="active-disease-subtext">Showing verified success rates &amp; rankings for this disease only. Cards for other diseases are hidden.</span>
+                </div>
+                <button type="button" class="btn-clear-disease" onclick="clearDiseaseFilter()">✕ Show All Diseases</button>
             </div>
 
             <!-- Hospital Cards Grid Container (Populated dynamically) -->
@@ -361,7 +377,7 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-col">
-                <div class="logo">🏥 HospitalConnect</div>
+                <div class="logo">🏥 NearMed</div>
                 <p>Empowering patients to make informed healthcare decisions through transparent pricing, verified facilities, and intelligent hospital matching.</p>
             </div>
             <div class="footer-col">
@@ -387,11 +403,11 @@
                 <h4>Emergency Contact</h4>
                 <p>Ambulance Service: <strong>108</strong></p>
                 <p>State Medical Helpline: <strong>104</strong></p>
-                <p>Support: <strong>care@hospitalconnect.in</strong></p>
+                <p>Support: <strong>care@nearmed.in</strong></p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 HospitalConnect. All rights reserved. For informational purposes only. In life-threatening emergencies, please call 108 or go to the nearest emergency ward.</p>
+            <p>&copy; 2026 NearMed. All rights reserved. For informational purposes only. In life-threatening emergencies, please call 108 or go to the nearest emergency ward.</p>
         </div>
     </footer>
 
@@ -400,16 +416,17 @@
     <script>
         (function () {
             // Connect frontend to the local server
-            const API_BASE = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
-                ? window.location.origin
-                : 'http://127.0.0.1:8000';
-
+            const API_URL = 'https://hospital-find.onrender.com/api/hospitals';
             const hospitalListEl = document.getElementById('hospitals-container');
             const noResultsEl = document.getElementById('no-results-msg');
             const resultsHeadingEl = document.getElementById('results-count-heading');
             const resultsSubtextEl = document.getElementById('results-subtext');
 
-            function renderHospitalCards(hospitals) {
+            function renderHospitalCards(hospitals, options) {
+                if (typeof window.renderHospitals === 'function') {
+                    window.renderHospitals(hospitals, options);
+                    return;
+                }
                 if (!hospitalListEl) return;
 
                 hospitalListEl.innerHTML = '';
@@ -571,6 +588,10 @@
             }
 
             async function fetchHospitalsFromServer() {
+                if (typeof window.applyFilters === 'function') {
+                    window.applyFilters();
+                    return;
+                }
                 const searchVal = document.getElementById('search-input')?.value?.trim() || '';
                 const city = document.getElementById('city-filter')?.value || '';
                 const speciality = document.getElementById('speciality-filter')?.value || '';

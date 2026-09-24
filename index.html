@@ -3,26 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>HospitalConnect - Registration</title>
-    
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="register-container">
-
     <div class="register-left">
         <div class="logo">🏥 NearMed</div>
-
         <h1>Find the Right Hospital.</h1>
-
-        <p>
-            Search hospitals by speciality, location, treatment price
-            and available facilities.
-        </p>
-
+        <p>Search hospitals by speciality, location, treatment price and available facilities.</p>
         <div class="features">
             <div>✓ Search hospitals</div>
             <div>✓ Compare facilities</div>
@@ -31,15 +21,11 @@
         </div>
     </div>
 
-
     <div class="register-card">
-
         <h2>Create Account</h2>
-
-        <p class="subtitle">
-            Register to use HospitalConnect
-        </p>
-        <form id="registration-form" action="home.html" method="GET">
+        <p class="subtitle">Register to use HospitalConnect</p>
+        
+        <form id="registration-form">
             <label>Full Name</label>
             <input type="text" name="name" placeholder="Enter your full name" required>
 
@@ -64,14 +50,52 @@
                 <option value="Other">Other</option>
             </select>
 
-            <button type="submit">
-                Register &amp; Save
-            </button>
+            <button type="submit" id="submit-btn">Register &amp; Save</button>
         </form>
-
     </div>
-
 </div>
+
+<script>
+    document.getElementById('registration-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = 'Registering...';
+        btn.disabled = true;
+
+        const formData = {
+            name: this.name.value,
+            email: this.email.value,
+            phone: this.phone.value,
+            city: this.city.value
+        };
+
+        try {
+            const response = await fetch('https://hospital-find.onrender.com/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                localStorage.setItem('user_name', formData.name);
+                localStorage.setItem('user_city', formData.city);
+                window.location.href = 'home.html';
+            } else {
+                alert('Registration failed. Please try again.');
+                btn.innerText = 'Register & Save';
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Server error! Checking network...');
+            btn.innerText = 'Register & Save';
+            btn.disabled = false;
+        }
+    });
+</script>
 
 </body>
 </html>
