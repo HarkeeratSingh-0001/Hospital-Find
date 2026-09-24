@@ -161,7 +161,8 @@
                         </div>
 
                         <div class="search-submit-row">
-                            <button type="submit" class="btn-primary-search">
+                            <button type="submit" class="btn-primary-search"
+                                onclick="document.getElementById('hospital-results').scrollIntoView({ behavior: 'smooth' });">
                                 <span>Search Hospitals &amp; Diseases</span>
                             </button>
                             <button type="button" class="btn-reset-search" onclick="resetFilters()">
@@ -219,7 +220,7 @@
         </section>
 
         <!-- Hospitals Section -->
-        <section class="hospitals-section" id="hospitals">
+        <section class="hospitals-section" id="hospital-results">
             <div class="hospitals-toolbar">
                 <div class="results-meta">
                     <h2 id="results-count-heading">Available Hospitals</h2>
